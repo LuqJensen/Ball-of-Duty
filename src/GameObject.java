@@ -4,6 +4,8 @@ public abstract class GameObject
     public Body body;
     public Physics physics;
     public View view;
+    
+    public int id;
 
     public GameObject()
     {
@@ -53,5 +55,15 @@ public abstract class GameObject
     public void setView(View view)
     {
         this.view = view;
+    }
+    
+    public int getId() 
+    {
+    	return id;
+    }
+    
+    public void setId(int id)
+    {
+    	this.id = id;
     }
 }

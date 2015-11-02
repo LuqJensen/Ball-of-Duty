@@ -52,7 +52,7 @@ public class GameClient
         this.sceneAbsoluteLocation = sceneAbsoluteLocation;
         if (characterController != null)
         {
-            characterController.setCanvasAbsoluteLocation(sceneAbsoluteLocation);
+            characterController.setCanvasRelativeLocation(sceneAbsoluteLocation);
         }
 
     }

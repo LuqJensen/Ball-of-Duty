@@ -3,6 +3,8 @@ package application;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -38,7 +40,8 @@ public class ClientMap implements Observer
         this.clientChar = clientChar;
         if (clientChar.weapon != null)
         {
-            clientChar.weapon.registerObserver(this);
+            clientChar.weapon.addObserver(this);
+            System.out.println(clientChar.weapon.countObservers());
         }
         mapActive = true;
         gameObjects = new ConcurrentHashMap<>();
@@ -169,7 +172,7 @@ public class ClientMap implements Observer
                 isInGame = false;
                 for (ObjectPosition pos : positions)
                 {
-                    if (go.getId() == pos.getId()||go instanceof Bullet)
+                    if (go.getId() == pos.getId() || go instanceof Bullet)
                     {
                         isInGame = true;
                         break;
@@ -231,32 +234,6 @@ public class ClientMap implements Observer
     }
 
     @Override
-    public void update(Observable observable, Object args)
-    {
-        if (observable instanceof Weapon) // Spawned a bullet.
-        {
-            if (args instanceof Bullet)
-            {
-
-                Bullet bullet = (Bullet) args;
-                bullet.registerObserver(this);
-                gameObjects.put(bullet.getId(), bullet);
-
-            }
-
-            // Shooting occured
-        }
-        else if (observable instanceof Bullet)
-        {
-
-            Bullet bullet = (Bullet) observable;
-            gameObjects.remove(bullet.getId());
-
-        }
-
-    }
-
-    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -264,6 +241,33 @@ public class ClientMap implements Observer
         result = prime * result + mapHeight;
         result = prime * result + mapWidth;
         return result;
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        System.out.println("updated called");
+        if (o instanceof Weapon) // Spawned a bullet.
+        {
+            if (arg instanceof Bullet)
+            {
+
+                Bullet bullet = (Bullet) arg;
+                bullet.addObserver(this);
+                gameObjects.put(bullet.getId(), bullet);
+
+            }
+
+            // Shooting occured
+        }
+        else if (o instanceof Bullet)
+        {
+
+            Bullet bullet = (Bullet) o;
+            gameObjects.remove(bullet.getId());
+
+        }
+
     }
 
 }

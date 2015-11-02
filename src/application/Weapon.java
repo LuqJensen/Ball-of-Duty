@@ -1,11 +1,18 @@
 package application;
 
 import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 import javafx.geometry.Point2D;
 
-public class Weapon implements Observable, Observer
+/**
+ * The weapon takes care of spawning bullets.
+ * @author Gruppe6
+ *
+ */
+public class Weapon extends Observable implements Observer
 {
 
     private double firerate;
@@ -16,15 +23,13 @@ public class Weapon implements Observable, Observer
     private boolean shooting = false;
     private Set<Bullet> activeBullets;
     Timer timer;
-    private Set<Observer> observers;
 
     /**
-     * 
-     * @param gameObject
+     * Creates a weapon for the game object.
+     * @param gameObject The game object this weapon belongs to.
      * @param firerate
      *            How many bullets the weapon shoots per second.
-     * @param bullet
-     * @param magazineSize
+     * @param magazineSize The size of the magazine. Example: Value of 30 would result in a need to reload every time 30 bullets was spawned.
      * @param damage
      *            Damage per bullet.
      */
@@ -37,11 +42,13 @@ public class Weapon implements Observable, Observer
         this.firerate = firerate;
         this.damage = damage;
         this.magazineSize = magazineSize;
-        observers = new HashSet<>();
     }
 
-    int bulletsCreated = 500;
+    int bulletsCreated = 500; // FIXME need better way of handling ID.
 
+    /**
+     * The weapons starts shooting bullets by its firerate.
+     */
     public void startShooting()
     {
 
@@ -64,9 +71,11 @@ public class Weapon implements Observable, Observer
                 velocity.setMagnitude(300); // bullet speed magic number atm
                
                 Bullet bullet = new Bullet(bulletsCreated++, position, 10, 10, velocity, damage);
+                setChanged();
                 notifyObservers(bullet); // Det her skal ske med noget server shit.
+                System.out.println(this.countObservers());
                 activeBullets.add(bullet);
-                bullet.registerObserver(this);
+                bullet.addObserver(this);
                
                 
                 try
@@ -84,53 +93,28 @@ public class Weapon implements Observable, Observer
 
     }
 
+    /**
+     * The weapon stops shooting bullets.
+     */
     public void stopShooting()
     {
         shooting = false;
     }
+    /**
+     * The current active bullets of the weapon. I.e the bullets that are still in the air that this weapon has created.
+     * @return Returns the active bullets this weapon has created.
+     */
     public Set<Bullet> getActiveBullets()
     {
         return activeBullets;
     }
 
-    @Override
-    public void notifyObservers(Object arg)
-    {
-        for (Observer obs : observers)
-        {
-            obs.update(this, arg);
-        }
-
-    }
-
-    @Override
-    public void notifyObservers()
-    {
-        for (Observer obs : observers)
-        {
-            obs.update(this, null);
-        }
-
-    }
-
-    @Override
-    public void registerObserver(Observer obs)
-    {
-        observers.add(obs);
-
-    }
-
-    @Override
-    public void unregisterObserver(Observer obs)
-    {
-        observers.remove(obs);
-
-    }
 
     
     @Override
     public void update(Observable observable, Object args)
     {
+        System.out.println("hej");
         if(observable instanceof Bullet)
         {
             activeBullets.remove(observable);

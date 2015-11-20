@@ -175,7 +175,7 @@ public class ClientMap implements Observer
                     scoreLabel.setText("Score: " + (int)clientChar.getScore());
                     if (!clientChar.isDestroyed())
                     {
-                        healthLabel.setText("Health: " +clientChar.getHealth().getValue());
+                        healthLabel.setText("Health: " + clientChar.getHealth().getValue());
                     }
                     else
                     {
@@ -283,7 +283,7 @@ public class ClientMap implements Observer
 
             GameObject go = gameObjects.get(id);
 
-            if (go != null )
+            if (go != null)
             {
 
                 BoDCharacter bodCharacter = (BoDCharacter)go;
@@ -332,13 +332,18 @@ public class ClientMap implements Observer
                 return;
             }
 
-            addGameObject(EntityFactory.getEntity(data, data.entityType));
+            if (data.objectId != clientChar.getId())
+            {
+                addGameObject(EntityFactory.getEntity(data, data.entityType));
+            }
         }
     }
 
     private void addGameObject(GameObject go)
     {
+
         gameObjects.put(go.getId(), go);
+
         go.addObserver(this);
     }
 

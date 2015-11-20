@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.plaf.synth.SynthSplitPaneUI;
+
 import application.engine.entities.Bullet;
 import application.engine.factories.EntityFactory;
 import application.engine.rendering.ClientMap;
@@ -32,7 +34,8 @@ public class Broker
     private DatagramSocket _socket;
     private Socket tcpSocket;
     private boolean isActive = false;
-    private static final String SERVER_IP = "10.126.0.225";
+    private static final String SERVER_IP = "localhost";
+    private static final int SERVER_UDP_PORT= 15001;
     private static final int SERVER_TCP_PORT = 15010;
     private DataOutputStream output = null;
 
@@ -51,10 +54,20 @@ public class Broker
         }
         try
         {
-            _socket = new DatagramSocket(null); // force _socket not to bind to
-                                                // an address.
-            _socket.bind(null); // force _socket to pick up a free port and an
-                                // address determined by the operating system.
+            
+            _socket = new DatagramSocket(); 
+          
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try
+        {
+            tcpSocket = new Socket(ina, SERVER_TCP_PORT);
+            tcpSocket.setTcpNoDelay(true);
+            output = new DataOutputStream(tcpSocket.getOutputStream());
         }
         catch (IOException e)
         {
@@ -72,33 +85,33 @@ public class Broker
     public void activate(ClientMap map)
     {
         this.map = map;
-        try
-        {
-            tcpSocket = new Socket(ina, SERVER_TCP_PORT);
-            tcpSocket.setTcpNoDelay(true);
-            output = new DataOutputStream(tcpSocket.getOutputStream());
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        
         isActive = true;
         startListeningTCP();
-        receive();
+        receiveUdp();
 
     }
 
     /**
-     * Returns the port the broker is listening on.
+     * Returns the udp port the broker is listening on.
      * 
-     * @return The port the broker is listening on.
+     * @return The udp  port the broker is listening on.
      */
-    public int getPort()
+    public int getUdpPort()
     {
         return _socket.getLocalPort();
     }
-
+    
+    /**
+     * Returns the tcp port the broker is listening on.
+     * 
+     * @return The tcp  port the broker is listening on.
+     */
+    public int getTcpPort()
+    {
+       return tcpSocket.getLocalPort();
+    }
+    
     /**
      * Returns the map the broker is communicating with.
      * 
@@ -159,70 +172,14 @@ public class Broker
     public void stop()
     {
         isActive = false;
+        _socket.close();
+
     }
 
     /**
      * Starts listening for updates.
      */
-    private void receive()
-    {
-        new Thread(() ->
-        {
-
-            while (isActive)
-            {
-                DatagramPacket packet;
-
-                byte[] buf = new byte[1024];
-                packet = new DatagramPacket(buf, buf.length);
-                try
-                {
-                    _socket.receive(packet);
-                    byte[] data = Arrays.copyOf(packet.getData(), packet.getLength());
-
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    buffer.order(ByteOrder.LITTLE_ENDIAN);
-                    buffer.put(data);
-                    buffer.rewind();
-
-                    if (buffer.get() != 1) // start of heading
-                    {
-                        return;
-                    }
-                    byte value = buffer.get();
-                    Opcodes opcode = Opcodes.fromInteger(value);
-
-                    buffer.get(); // start of text
-
-                    switch (opcode)
-                    {
-                        case BROADCAST_POSITION_UPDATE:
-                        {
-                            readPositionUpdate(buffer);
-                            break;
-                        }
-                        case BROADCAST_SCORE_UPDATE:
-                        {
-                            readScoreUpdate(buffer);
-                            break;
-                        }
-                        case BROADCAST_HEALTH_UPDATE:
-                        {
-                            readHealthUpdate(buffer);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
+    
 
     /**
      * Handles reading of score updates;
@@ -286,7 +243,66 @@ public class Broker
 
         map.updatePositions(positions);
     }
+    private void receiveUdp()
+    {
+        new Thread(() ->
+        {
+            while (isActive)
+            {
+                DatagramPacket packet = null;
 
+                byte[] buf = new byte[1024];
+
+                packet = new DatagramPacket(buf, buf.length);
+
+                try
+                {
+                    _socket.receive(packet);
+                    byte[] data = Arrays.copyOf(packet.getData(), packet.getLength());
+
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    buffer.order(ByteOrder.LITTLE_ENDIAN);
+                    buffer.put(data);
+                    buffer.rewind();
+
+                    if (buffer.get() != 1) // start of heading
+                    {
+                        return;
+                    }
+                    byte value = buffer.get();
+                    Opcodes opcode = Opcodes.fromInteger(value);
+
+                    buffer.get(); // start of text
+
+                    switch (opcode)
+                    {
+                        case BROADCAST_POSITION_UPDATE:
+                        {
+                            readPositionUpdate(buffer);
+                            break;
+                        }
+                        case BROADCAST_SCORE_UPDATE:
+                        {
+                            readScoreUpdate(buffer);
+                            break;
+                        }
+                        case BROADCAST_HEALTH_UPDATE:
+                        {
+                            readHealthUpdate(buffer);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
     /**
      * Sends a data with UDP, as a byte array, to the server.
      * 
@@ -295,10 +311,14 @@ public class Broker
      */
     public void sendUdp(byte[] data)
     {
-        DatagramPacket packet = new DatagramPacket(data, data.length, ina, 15001); // TODO dynamically port.
+        DatagramPacket packet = new DatagramPacket(data, data.length, ina, SERVER_UDP_PORT); // TODO dynamically port.
         try
         {
-            _socket.send(packet);
+            if(!_socket.isClosed())
+            {
+                _socket.send(packet);
+            }
+            
         }
         catch (IOException e)
         {
@@ -442,7 +462,7 @@ public class Broker
      * @param input
      *            The ByteBuffer that handles reading of data send from the server.
      */
-    private void readDisconnectedPlayer(ByteBuffer input) 
+    private void readDisconnectedPlayer(ByteBuffer input)
     {
         int playerId = input.getInt();
         int objectId = input.getInt();
@@ -516,5 +536,7 @@ public class Broker
         int killerId = input.getInt();
         map.killNotification(victimId, killerId);
     }
+
+   
 
 }

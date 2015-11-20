@@ -140,7 +140,7 @@ public class GameClient
         try
         {
             Broker broker = new Broker();
-            GameDTO map = ibs.joinGame(clientPlayer.getId(), broker.getPort());
+            GameDTO map = ibs.joinGame(clientPlayer.getId(), broker.getUdpPort(),broker.getTcpPort());
             clientPlayer.createNewCharacter(map.getCharacterId());
             cMap = new ClientMap(map, gameBox, broker, clientPlayer.getCharacter());
 
@@ -163,7 +163,11 @@ public class GameClient
     {
         try
         {
-            ibs.quitGame(clientPlayer.getId());
+            if(ibs != null&&clientPlayer!= null)
+            {
+                ibs.quitGame(clientPlayer.getId());
+            }
+           
         }
         catch (RemoteException e)
         {

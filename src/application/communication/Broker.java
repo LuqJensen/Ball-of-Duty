@@ -32,7 +32,7 @@ public class Broker
     private DatagramSocket _socket;
     private Socket tcpSocket;
     private boolean isActive = false;
-    private static final String SERVER_IP = "10.126.0.225";
+    private static final String SERVER_IP = "localhost";
     private static final int SERVER_TCP_PORT = 15010;
     private DataOutputStream output = null;
 
@@ -442,7 +442,7 @@ public class Broker
      * @param input
      *            The ByteBuffer that handles reading of data send from the server.
      */
-    private void readDisconnectedPlayer(ByteBuffer input) 
+    private void readDisconnectedPlayer(ByteBuffer input)
     {
         int playerId = input.getInt();
         int objectId = input.getInt();
@@ -471,7 +471,13 @@ public class Broker
     private void readNewPlayer(ByteBuffer input) // Should probably tell GameClient about the new player instead
     {
         GameObjectDAO data = new GameObjectDAO();
-        int playerId = input.getInt();
+        byte nicknameLength = input.get();
+        String nickname = "";
+        for (int i = 0; i < nicknameLength; i++)
+        {
+            nickname += (char)(input.get());
+        }
+        data.nickname = nickname;
         data.objectId = input.getInt();
         data.x = input.getDouble();
         data.y = input.getDouble();

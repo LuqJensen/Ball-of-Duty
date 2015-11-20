@@ -2,6 +2,7 @@ package application.communication;
 
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
@@ -27,7 +28,6 @@ public class GameClient
 {
 
     public ClientMap cMap;
-    public List<Player> enemyPlayers;
     public Player clientPlayer;
     public Account account;
     public CharacterController characterController;
@@ -147,7 +147,6 @@ public class GameClient
         }
         catch (RemoteException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -189,15 +188,5 @@ public class GameClient
 
     }
 
-    /**
-     * Sets the enemy players in the game.
-     * 
-     * @param enemyPlayers
-     *            The enemy players in the game.
-     */
-    public void setEnemyPlayers(List<Player> enemyPlayers)
-    {
-        this.enemyPlayers = enemyPlayers;
-    }
 
 }

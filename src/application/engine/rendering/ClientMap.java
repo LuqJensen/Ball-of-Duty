@@ -24,6 +24,7 @@ import application.engine.factories.EntityFactory;
 import application.engine.game_object.Body;
 import application.engine.game_object.GameObject;
 import application.engine.game_object.Weapon;
+import application.gui.Leaderboard;
 import application.util.Timer;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
@@ -57,6 +58,7 @@ public class ClientMap implements Observer
     private AnimationTimer animationTimer;
     private boolean mapActive = false;
     private int serverGameId;
+    private Leaderboard leaderboard;
     private ConcurrentLinkedQueue<GameObject> unassignedBullets;
 
     /**
@@ -78,6 +80,7 @@ public class ClientMap implements Observer
         this.serverGameId = serverGame.getGameId();
         this.clientChar = clientChar;
         this.clientChar.addObserver(this);
+        this.leaderboard = new Leaderboard();
         if (clientChar.getWeapon() != null)
         {
             clientChar.getWeapon().addObserver(this);
@@ -109,18 +112,18 @@ public class ClientMap implements Observer
             }
 
         }
-        for (PlayerDTO pdto : serverGame.getPlayers()) // TODO figure out how we related player to a character.
+
+        for (PlayerDTO pdto : serverGame.getPlayers())
         {
-            // BoDCharacter playerChar = (BoDCharacter)gameObjects.get(pdto.getId());
-            // if(playerChar!= null)
-            // {
-            // playerChar.setNickname(pdto.getNickname());
-            // }
-            // if(pdto.getId()==clientChar.getId())
-            // {
-            // clientChar.setNickname(pdto.getNickname());
-            // }
+            BoDCharacter character = (BoDCharacter)gameObjects.get(pdto.getCharacterId());
+            if (character == null)
+            {
+                continue;
+            }
+            character.setNickname(pdto.getNickname());
+            leaderboard.addCharacter(character);
         }
+        gameBox.setRight(leaderboard);
 
         fpsLabel = new Label();
         fpsLabel.setPrefSize(50, 20);
@@ -175,12 +178,13 @@ public class ClientMap implements Observer
                     scoreLabel.setText("Score: " + (int)clientChar.getScore());
                     if (!clientChar.isDestroyed())
                     {
-                        healthLabel.setText("Health: " +clientChar.getHealth().getValue());
+                        healthLabel.setText("Health: " + clientChar.getHealth().getValue());
                     }
                     else
                     {
                         healthLabel.setText("Health: DEAD");
                     }
+                    leaderboard.refresh();
 
                     timer.reset();
                     frames = 0;
@@ -189,6 +193,7 @@ public class ClientMap implements Observer
                 {
                     frames++;
                 }
+                canvas.requestFocus();
 
             }
         };
@@ -283,7 +288,7 @@ public class ClientMap implements Observer
 
             GameObject go = gameObjects.get(id);
 
-            if (go != null )
+            if (go != null)
             {
 
                 BoDCharacter bodCharacter = (BoDCharacter)go;
@@ -338,6 +343,10 @@ public class ClientMap implements Observer
 
     private void addGameObject(GameObject go)
     {
+        if (go instanceof BoDCharacter)
+        {
+            leaderboard.addCharacter((BoDCharacter)go);
+        }
         gameObjects.put(go.getId(), go);
         go.addObserver(this);
     }
@@ -354,6 +363,10 @@ public class ClientMap implements Observer
         if (go != null)
         {
             go.destroy();
+            if (go instanceof BoDCharacter)
+            {
+                leaderboard.remove((BoDCharacter)go);
+            }
             gameObjects.remove(id);
         }
 

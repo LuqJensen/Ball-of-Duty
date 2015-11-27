@@ -1,24 +1,31 @@
 package application.communication;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.rpc.ServiceException;
 
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.AccountDTO;
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameDTO;
+import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO;
 import org.tempuri.BoDServiceLocator;
 import org.tempuri.IBoDService;
 
 import application.account.Account;
 import application.account.Player;
+import application.engine.entities.BoDCharacter;
+import application.engine.game_object.GameObject;
 import application.engine.rendering.ClientMap;
+import application.gui.HighscoreLeaderboard;
+import application.gui.Leaderboard;
 import application.input.CharacterController;
-import javafx.geometry.Point2D;
+import application.engine.rendering.TranslatedPoint;
 import javafx.scene.layout.BorderPane;
 
 /**
- * Communicates with the server via webservices and is the main facade for a
- * game.
+ * Communicates with the server via webservices and is the main facade for a game.
  * 
  * @author Gruppe6
  *
@@ -26,28 +33,28 @@ import javafx.scene.layout.BorderPane;
 public class GameClient
 {
 
-    public ClientMap cMap;
-    public Player clientPlayer;
-    public Account account;
-    public CharacterController characterController;
-    public Point2D sceneRelativeLocation;
+    private ClientMap cMap;
+    private Player clientPlayer;
+    private Account account;
+    private CharacterController characterController;
+    private TranslatedPoint sceneRelativeLocation;
     IBoDService ibs;
+    private ConcurrentMap<Integer, GameObject> gameObjects;
 
     /**
-     * Creates a game client with the current relative location of the window.
-     * The relative location is based on how the scene's is located relative to
-     * the operating system.
+     * Creates a game client with the current relative location of the window. The relative location is based on how the scene's is located
+     * relative to the operating system.
      * 
      * @param windowRelativeLocation
-     *            The current relative location of the window. The relative
-     *            location is based on how the scene's is located relative to
-     *            the operating system,
+     *            The current relative location of the window. The relative location is based on how the scene's is located relative to the
+     *            operating system,
      */
-    public GameClient(Point2D windowRelativeLocation)
+    public GameClient(TranslatedPoint windowRelativeLocation)
     {
 
         this.sceneRelativeLocation = windowRelativeLocation;
         BoDServiceLocator server1 = new BoDServiceLocator();
+        gameObjects = new ConcurrentHashMap<>();
 
         try
         {
@@ -59,6 +66,30 @@ public class GameClient
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+    }
+
+    public HighscoreLeaderboard getHighscoreLeaderboard()
+    {
+
+        HighscoreLeaderboard leaderboard = new HighscoreLeaderboard();
+
+        PlayerDTO[] players;
+        try
+        {
+            players = ibs.getLeaderboard();
+            for (PlayerDTO pdto : players)
+            {
+                leaderboard.addEntry(pdto.getNickname(), pdto.getId(), pdto.getHighScore());
+            }
+            leaderboard.refresh();
+            return leaderboard;
+        }
+        catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
 
     }
 
@@ -113,14 +144,13 @@ public class GameClient
     }
 
     /**
-     * Sets the scenes relative location. The relative location is based on how
-     * the scene's is located relative to the operating system.
+     * Sets the scenes relative location. The relative location is based on how the scene's is located relative to the operating system.
      * 
      * @param sceneRelativeLocation
-     *            The scenes relative location. he relative location is based on
-     *            how the scene's is located relative to the operating system.
+     *            The scenes relative location. he relative location is based on how the scene's is located relative to the operating
+     *            system.
      */
-    public void setSceneRelativeLocation(Point2D sceneRelativeLocation)
+    public void setSceneRelativeLocation(TranslatedPoint sceneRelativeLocation)
     {
         this.sceneRelativeLocation = sceneRelativeLocation;
         if (characterController != null)
@@ -131,8 +161,7 @@ public class GameClient
     }
 
     /**
-     * Tries to join a game. The game graphics and UI is handled in a BorderPane
-     * called game box.
+     * Tries to join a game. The game graphics and UI is handled in a BorderPane called game box.
      * 
      * @param gameBox
      *            The BorderPane where the game graphics and UI is handled.
@@ -148,7 +177,7 @@ public class GameClient
                                                                                                            // character
                                                                                                            // creation
             clientPlayer.createNewCharacter(map.getCharacterId());
-            cMap = new ClientMap(map, gameBox, broker, clientPlayer.getCharacter());
+            cMap = new ClientMap(map, gameBox, broker, clientPlayer);
 
         }
         catch (RemoteException e)
@@ -190,13 +219,26 @@ public class GameClient
     /**
      * Gets the current CharacterController controlling the client character.
      * 
-     * @return Returns the current CharacterController controlling the client
-     *         character.
+     * @return Returns the current CharacterController controlling the client character.
      */
     public CharacterController getCharacterController()
     {
         return characterController;
 
     }
+    /**
+     * Gets the current player of the client.
+     * 
+     * @return Returns the current player of the client.
+     */
+    public Player getPlayer()
+    {
+        return clientPlayer;
 
+    }
+    
+    public ClientMap getMap()
+    {
+        return cMap;
+    }
 }

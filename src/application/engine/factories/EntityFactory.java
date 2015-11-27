@@ -14,7 +14,7 @@ import application.engine.entities.Bullet.Type;
 import application.engine.game_object.GameObject;
 import application.engine.game_object.Weapon;
 import application.util.Vector2;
-import javafx.geometry.Point2D;
+import application.engine.rendering.TranslatedPoint;
 import javafx.scene.image.Image;
 
 /**
@@ -80,7 +80,7 @@ public class EntityFactory
     {
 
         BodyDTO body = dto.getBody();
-        Point2D position = new Point2D(body.getPosition().getX(), body.getPosition().getY());
+        TranslatedPoint position = new TranslatedPoint(body.getPosition().getX(), body.getPosition().getY());
         switch (type)
         {
             case WALL:
@@ -112,14 +112,14 @@ public class EntityFactory
         {
             case ENEMY_CHARACTER:
             {
-                BoDCharacter enemy = new BoDCharacter(data.objectId, new Point2D(data.x,data.y), data.width, data.height, 0,
+                BoDCharacter enemy = new BoDCharacter(data.objectId, new TranslatedPoint(data.x,data.y), data.width, data.height, 0,
                         defaultImages.get(EntityType.ENEMY_CHARACTER));
                 enemy.setNickname(data.nickname);
                 return enemy;
             }
             case BULLET:
             {
-                return new Bullet(data.objectId, new Point2D(data.x, data.y), data.height, new Vector2(data.velocityX, data.velocityY), data.damage,
+                return new Bullet(data.objectId, new TranslatedPoint(data.x, data.y), data.height, new Vector2(data.velocityX, data.velocityY), data.damage,
                         data.bulletType, (Image)Weapon.getBulletImages().get(data.bulletType), data.ownerId);
             }
 
@@ -144,7 +144,7 @@ public class EntityFactory
             case WALL:
                 return new Wall(id);
             case ENEMY_CHARACTER:
-                GameObject enemy = new BoDCharacter(id, new Point2D(0, 0), 50, 50, 0, defaultImages.get(EntityType.ENEMY_CHARACTER));
+                GameObject enemy = new BoDCharacter(id, new TranslatedPoint(0, 0), 50, 50, 0, defaultImages.get(EntityType.ENEMY_CHARACTER));
                 return enemy;
         }
         return null;

@@ -6,7 +6,7 @@ import application.engine.game_object.Health;
 import application.engine.game_object.View;
 import application.engine.game_object.Weapon;
 import application.engine.game_object.physics.Physics;
-import javafx.geometry.Point2D;
+import application.engine.rendering.TranslatedPoint;
 import javafx.scene.image.Image;
 
 /**
@@ -37,7 +37,7 @@ public class BoDCharacter extends GameObject
      * @param speed
      *            Movement speed of the character.
      */
-    public BoDCharacter(int id, Point2D position, double width, double height, int speed, Image image)
+    public BoDCharacter(int id, TranslatedPoint position, double width, double height, int speed, Image image)
     {
         super(id);
         this.body = new Body(this, position, width, height, TYPE);

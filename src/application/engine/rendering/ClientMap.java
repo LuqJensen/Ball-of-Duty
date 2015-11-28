@@ -24,6 +24,7 @@ import application.engine.game_object.Weapon;
 import application.gui.Leaderboard;
 import application.util.Timer;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -38,7 +39,7 @@ import javafx.scene.layout.VBox;
  * @author Gruppe6
  *
  */
-public class ClientMap implements Observer
+public class ClientMap extends Observable implements Observer
 {
 
     private Broker broker;
@@ -57,11 +58,12 @@ public class ClientMap implements Observer
     private int serverGameId;
     private Leaderboard leaderboard;
     private ConcurrentLinkedQueue<GameObject> unassignedBullets;
+    private boolean choosing;
+    private ConcurrentLinkedQueue<GameObjectDAO> addQueue;
 
     /**
-     * Creates a client map defining the serverMap its based upon, the gamebox
-     * it should be drawn in, the broker it uses to communicate with the server
-     * with and the character that belongs to the client.
+     * Creates a client map defining the serverMap its based upon, the gamebox it should be drawn in, the broker it uses to communicate with
+     * the server with and the character that belongs to the client.
      * 
      * @param serverGame
      *            The server map which the ClientMap is based upon.
@@ -75,9 +77,11 @@ public class ClientMap implements Observer
     public ClientMap(GameDTO serverGame, BorderPane gameBox, Broker broker, BoDCharacter clientChar)
     {
         this.unassignedBullets = new ConcurrentLinkedQueue<>();
+        this.addQueue = new ConcurrentLinkedQueue<>();
         this.serverGameId = serverGame.getGameId();
         this.clientChar = clientChar;
         this.clientChar.addObserver(this);
+        System.out.println("My id " + clientChar.getId());
         this.leaderboard = new Leaderboard();
         if (clientChar.getWeapon() != null)
         {
@@ -113,7 +117,7 @@ public class ClientMap implements Observer
 
         for (PlayerDTO pdto : serverGame.getPlayers())
         {
-            BoDCharacter character = (BoDCharacter)gameObjects.get(pdto.getCharacterId());
+            BoDCharacter character = (BoDCharacter) gameObjects.get(pdto.getCharacterId());
             if (character == null)
             {
                 continue;
@@ -141,7 +145,7 @@ public class ClientMap implements Observer
         labelBox.getChildren().add(scoreLabel);
         labelBox.getChildren().add(healthLabel);
 
-        this.canvas = (Canvas)gameBox.getCenter();
+        this.canvas = (Canvas) gameBox.getCenter();
         gc = canvas.getGraphicsContext2D();
     }
 
@@ -173,7 +177,7 @@ public class ClientMap implements Observer
                 if (timer.getDuration() > 250)
                 {
                     fpsLabel.setText("fps: " + frames * 4);// every 0.25 second, time by 4 to get frame per second.
-                    scoreLabel.setText("Score: " + (int)clientChar.getScore());
+                    scoreLabel.setText("Score: " + (int) clientChar.getScore());
                     if (!clientChar.isDestroyed())
                     {
                         healthLabel.setText("Health: " + clientChar.getHealth().getValue());
@@ -289,7 +293,7 @@ public class ClientMap implements Observer
             if (go != null)
             {
 
-                BoDCharacter bodCharacter = (BoDCharacter)go;
+                BoDCharacter bodCharacter = (BoDCharacter) go;
                 double score = scoreMap.get(id);
                 bodCharacter.setScore(score);
             }
@@ -322,11 +326,12 @@ public class ClientMap implements Observer
      */
     public void addGameObject(GameObjectDAO data)
     {
-        if (data.entityType != null)
+        if (!choosing && data.entityType != null)
         {
+
             if (data.ownerId == clientChar.getId())
             {
-                Bullet bullet = (Bullet)unassignedBullets.poll();
+                Bullet bullet = (Bullet) unassignedBullets.poll();
                 bullet.setId(data.objectId);
                 addGameObject(bullet);
                 return;
@@ -337,13 +342,17 @@ public class ClientMap implements Observer
                 addGameObject(EntityFactory.getEntity(data, data.entityType));
             }
         }
+        else if (choosing)
+        {
+            addQueue.add(data);
+        }
     }
 
     private void addGameObject(GameObject go)
     {
         if (go instanceof BoDCharacter)
         {
-            leaderboard.addCharacter((BoDCharacter)go);
+            leaderboard.addCharacter((BoDCharacter) go);
         }
         gameObjects.put(go.getId(), go);
         go.addObserver(this);
@@ -363,7 +372,7 @@ public class ClientMap implements Observer
             go.destroy();
             if (go instanceof BoDCharacter)
             {
-                leaderboard.remove((BoDCharacter)go);
+                leaderboard.remove((BoDCharacter) go);
             }
             gameObjects.remove(id);
         }
@@ -386,12 +395,28 @@ public class ClientMap implements Observer
         broker.sendUpdate(posList);
     }
 
+    public void setChoosing(boolean input)
+    {
+        choosing = input;
+        if (!choosing)
+        {
+            while (addQueue.peek() != null)
+            {
+                addGameObject(addQueue.poll());
+            }
+        }
+
+    }
+
     public void killNotification(int victimId, int killerId)
     {
         destroyGameObject(victimId);
         if (victimId == clientChar.getId())
         {
             System.out.println("YOU DIED MOTAFUCASPKDSAD FUCKA");
+            choosing = true;
+            setChanged();
+            notifyObservers(this); // Game over pop up
         }
         else if (killerId == clientChar.getId())
         {
@@ -418,7 +443,7 @@ public class ClientMap implements Observer
     {
         if (o instanceof Weapon) // Spawned a bullet.
         {
-            Bullet bullet = (Bullet)arg;
+            Bullet bullet = (Bullet) arg;
             unassignedBullets.add(bullet);
             GameObjectDAO data = new GameObjectDAO();
             data.x = bullet.getBody().getPosition().getX();
@@ -434,7 +459,7 @@ public class ClientMap implements Observer
         }
         else if (o instanceof Bullet)
         {
-            Bullet bullet = (Bullet)o;
+            Bullet bullet = (Bullet) o;
             gameObjects.remove(bullet.getId());
             clientChar.getWeapon().getActiveBullets().remove(bullet.getId());
             o.deleteObserver(this);
@@ -443,11 +468,22 @@ public class ClientMap implements Observer
         }
         else if (o instanceof GameObject)
         {
-            GameObject go = (GameObject)o;
+            GameObject go = (GameObject) o;
 
             System.out.println("Game object destroyed: " + go.getId());
             gameObjects.remove(go.getId());
             o.deleteObserver(this);
+        }
+    }
+
+    public void setCharacter(BoDCharacter character)
+    {
+        clientChar = character;
+
+        addGameObject(clientChar);
+        if (clientChar.getWeapon() != null)
+        {
+            clientChar.getWeapon().addObserver(this);
         }
     }
 }

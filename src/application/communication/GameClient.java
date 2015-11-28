@@ -6,6 +6,7 @@ import javax.xml.rpc.ServiceException;
 
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.AccountDTO;
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameDTO;
+import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameObjectDTO;
 import org.tempuri.BoDServiceLocator;
 import org.tempuri.IBoDService;
 
@@ -18,8 +19,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.layout.BorderPane;
 
 /**
- * Communicates with the server via webservices and is the main facade for a
- * game.
+ * Communicates with the server via webservices and is the main facade for a game.
  * 
  * @author Gruppe6
  *
@@ -35,14 +35,12 @@ public class GameClient
     IBoDService ibs;
 
     /**
-     * Creates a game client with the current relative location of the window.
-     * The relative location is based on how the scene's is located relative to
-     * the operating system.
+     * Creates a game client with the current relative location of the window. The relative location is based on how the scene's is located
+     * relative to the operating system.
      * 
      * @param windowRelativeLocation
-     *            The current relative location of the window. The relative
-     *            location is based on how the scene's is located relative to
-     *            the operating system,
+     *            The current relative location of the window. The relative location is based on how the scene's is located relative to the
+     *            operating system,
      */
     public GameClient(Point2D windowRelativeLocation)
     {
@@ -114,12 +112,11 @@ public class GameClient
     }
 
     /**
-     * Sets the scenes relative location. The relative location is based on how
-     * the scene's is located relative to the operating system.
+     * Sets the scenes relative location. The relative location is based on how the scene's is located relative to the operating system.
      * 
      * @param sceneRelativeLocation
-     *            The scenes relative location. he relative location is based on
-     *            how the scene's is located relative to the operating system.
+     *            The scenes relative location. he relative location is based on how the scene's is located relative to the operating
+     *            system.
      */
     public void setSceneRelativeLocation(Point2D sceneRelativeLocation)
     {
@@ -132,8 +129,7 @@ public class GameClient
     }
 
     /**
-     * Tries to join a game. The game graphics and UI is handled in a BorderPane
-     * called game box.
+     * Tries to join a game. The game graphics and UI is handled in a BorderPane called game box.
      * 
      * @param gameBox
      *            The BorderPane where the game graphics and UI is handled.
@@ -157,6 +153,24 @@ public class GameClient
         characterController = new CharacterController(clientPlayer.getCharacter(), gameBox, sceneRelativeLocation);
         cMap.activate();
 
+    }
+
+    public void respawn(BorderPane gameBox, Specializations spec)
+    {
+        try
+        {
+            GameObjectDTO goDTO = ibs.respawn(clientPlayer.getId(), spec.getValue());
+            clientPlayer.createNewCharacter(goDTO.getId(), spec);
+            cMap.setCharacter(clientPlayer.getCharacter());
+
+            characterController = new CharacterController(clientPlayer.getCharacter(), gameBox, sceneRelativeLocation);
+            cMap.setChoosing(false);
+        }
+        catch (RemoteException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -188,8 +202,7 @@ public class GameClient
     /**
      * Gets the current CharacterController controlling the client character.
      * 
-     * @return Returns the current CharacterController controlling the client
-     *         character.
+     * @return Returns the current CharacterController controlling the client character.
      */
     public CharacterController getCharacterController()
     {

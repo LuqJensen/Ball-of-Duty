@@ -162,7 +162,6 @@ public class Broker
             }
         }
         buffer.put((byte)4); // ASCII Standard for End of transmission
-
         sendUdp(buffer.array());
     }
 
@@ -350,6 +349,7 @@ public class Broker
      */
     public void requestBulletCreation(GameObjectDAO data)
     {
+        
         ByteBuffer buffer = ByteBuffer.allocate(256);
 
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -503,6 +503,7 @@ public class Broker
         data.height = input.getDouble();
         int value = input.getInt();
         data.entityType = EntityFactory.EntityType.fromInteger(value);
+        System.out.println("NEW PLAYER JOINED: "+data.objectId);
         map.addGameObject(data);
     }
 

@@ -1,10 +1,16 @@
 package application.gui;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import application.gui.HighscoreLeaderboard.Entry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -12,10 +18,8 @@ import javafx.scene.control.ListView;
 public class HighscoreLeaderboard extends ListView<HighscoreLeaderboard.Entry>
 {
     private ObservableList<Entry> entries;
-    private Map<Integer, Entry> addedEntries;
+    private SortedSet<Entry> sortedEntries;
 
-    private Queue<Entry> removeQueue;
-    private Queue<Entry> addQueue;
     public static final int SCORE_LIMIT = 100;
 
     public class Entry
@@ -60,49 +64,33 @@ public class HighscoreLeaderboard extends ListView<HighscoreLeaderboard.Entry>
 
     public HighscoreLeaderboard()
     {
-        removeQueue = new ConcurrentLinkedQueue<>();
-        addQueue = new ConcurrentLinkedQueue<>();
         entries = FXCollections.observableArrayList();
-        addedEntries = new HashMap<>();
+        sortedEntries = Collections.synchronizedSortedSet(new TreeSet<Entry>((c1, c2) -> Double.compare(c2.score, c1.score)));
         setItems(entries);
         setStyle("-fx-font: 20 arial; ");
     }
 
     public void refresh()
     {
-
-        while (addQueue.peek() != null)
+        entries.clear();
+        int i = 0;
+        for(Entry e : sortedEntries)
         {
-            entries.add(addQueue.poll());
-
-        }
-        while (removeQueue.peek() != null)
-        {
-            entries.remove(removeQueue.poll());
-
-        }
-        entries.sort((c1, c2) -> Double.compare(c2.score, c1.score));
-        for (int i = 0; i < entries.size(); i++)
-        {
-            entries.get(i).position = i + 1;
+            i++;
+            entries.add(e);
+            e.position = i;
         }
     }
 
     public void addEntry(String nickname, int id, double score)
     {
 
-        if (score > SCORE_LIMIT && !addedEntries.keySet().contains(id))
-        {
-            Entry entry = new Entry(nickname, id, score);
-            addQueue.add(entry);
-            addedEntries.put(id, entry);
-        }
+        sortedEntries.add(new Entry(nickname, id, score));
 
     }
 
     public void remove(int id)
     {
-        removeQueue.add(addedEntries.get(id));
-        addedEntries.remove(id);
+       sortedEntries.removeIf((e)-> e.id == id);
     }
 }

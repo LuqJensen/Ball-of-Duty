@@ -150,7 +150,7 @@ public class GUI extends Application
 
         Label topText = new Label("Only shows scores higher than 100!");
         topText.setStyle("-fx-font-size: 20pt;-fx-font-family: Segoe UI Semibold;");
-
+        
         viewLB.setOnAction(ActionEvent ->
         {
             HighscoreLeaderboard hBoard = gameManager.getHighscoreLeaderboard();

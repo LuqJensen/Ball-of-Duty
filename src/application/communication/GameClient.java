@@ -74,22 +74,21 @@ public class GameClient
 
         HighscoreLeaderboard leaderboard = new HighscoreLeaderboard();
 
-        PlayerDTO[] players;
+       
         try
         {
-            players = ibs.getLeaderboard();
+            PlayerDTO[] players = ibs.getLeaderboard();
             for (PlayerDTO pdto : players)
             {
                 leaderboard.addEntry(pdto.getNickname(), pdto.getId(), pdto.getHighScore());
             }
             leaderboard.refresh();
-            return leaderboard;
         }
         catch (RemoteException e)
         {
             e.printStackTrace();
         }
-        return null;
+        return leaderboard;
 
     }
 

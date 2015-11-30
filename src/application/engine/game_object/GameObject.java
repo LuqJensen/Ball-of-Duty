@@ -76,9 +76,9 @@ public class GameObject extends Observable
     {
         if (view != null)
         {
-            view.draw(gc);
+            view.draw(gc); 
         }
-        if (getPhysics() != null)
+        if (getPhysics() != null) // TODO Figure out why there is visual bug on bullets when character is moving, if the view is updated after physics.
         {
             getPhysics().update();
         }

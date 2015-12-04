@@ -4,6 +4,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 
+import com.sun.javafx.collections.MappingChange.Map;
+
 import application.account.Player;
 import application.communication.GameClient;
 import application.engine.entities.specializations.Specializations;
@@ -11,6 +13,7 @@ import application.engine.rendering.ClientMap;
 import application.engine.rendering.TranslatedPoint;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,17 +43,27 @@ import javafx.stage.WindowEvent;
 
 public class GUI extends Application implements Observer
 {
-
-    public static GameClient gameManager;
-    private static final int WINDOW_START_WIDTH = 1350;
+	private static final int WINDOW_START_WIDTH = 1350;
     private static final int WINDOW_START_HEIGHT = 760;
-    private BorderPane gameBox;
-    private Stage tStage;
-    private Scene startMenu;
     public static final int CANVAS_START_WIDTH = 1100;
     public static final int CANVAS_START_HEIGHT = 680;
+    
+	public static GameClient gameManager;
     public static Scale scale;
-    Canvas canvas;
+    private Scene sceneMainMenu;
+    private BorderPane gameBox;
+    private Stage tStage;
+    public Canvas canvas;
+    
+    private EventHandler<ActionEvent> actionGoToLogin;
+    private EventHandler<ActionEvent> actionGoToCreateAccount;
+    private EventHandler<ActionEvent> actionGoToLeaderboard;
+    private EventHandler<ActionEvent> actionGoToMainMenuGuest;
+    private EventHandler<ActionEvent> actionCreateAccount;
+    private EventHandler<ActionEvent> actionLogin;
+    private EventHandler<ActionEvent> actionJoinGame;
+    private EventHandler<ActionEvent> actionQuitGame;
+    private EventHandler<WindowEvent> actionQuit;
 
     public static void main(String[] args)
     {
@@ -73,335 +86,338 @@ public class GUI extends Application implements Observer
     }
 
     @Override
-    public void start(Stage theStage)
+    public void  start(Stage theStage)
     {
-        this.tStage = theStage;
-        theStage.setTitle("Ball of Duty");
-        theStage.setHeight(WINDOW_START_HEIGHT);
-        theStage.setWidth(WINDOW_START_WIDTH);
-        theStage.centerOnScreen();
-        theStage.setResizable(false);
-        theStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+    	//Sizes
+    	final int buttonWidth = 210;
+        final int buttonHeight = 40;
+        
+        final int mainmenuWidth = 230;
+        final int mainmenuHeight = 350;
+        final int mainmenuSpacing = 8;
+    	
+    	// A. Start
+        tStage = theStage;
+        tStage.setTitle("Ball of Duty");
+        tStage.getIcons().add(new Image("images/ball_red.png")); //TODO get image from image map or something
+        tStage.setHeight(WINDOW_START_HEIGHT);
+        tStage.setWidth(WINDOW_START_WIDTH);
+        tStage.centerOnScreen();
+        tStage.setResizable(false);
+        
+        //1. Startmenu
+        BorderPane borderMainMenu = new BorderPane();
+        sceneMainMenu = new Scene(borderMainMenu);
+        sceneMainMenu.getStylesheets().add(("images/GUICSS.css"));
+        
+        Image image = new Image("images/frontpage.png");//TODO get image from image map or something
+        BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
+        BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
+        Background background = new Background(backgroundImage);
+        borderMainMenu.setBackground(background);
+
+        //1.1 MainMenuGuest (MMG)
+        VBox vBoxMMG = new VBox();
+        BorderPane.setMargin(vBoxMMG, new Insets(350, 0, 0, 150));
+        vBoxMMG.setSpacing(mainmenuSpacing);
+        vBoxMMG.setId("mainmenu");
+        vBoxMMG.setMinWidth(mainmenuWidth);
+        vBoxMMG.setMaxHeight(mainmenuHeight);
+        
+        Label lblNicknameMMG = new Label("Nickname:");
+        TextField tfNicknameMMG = new TextField();
+        Button btnJoinGameMMG = new Button("Join game");
+        Button btnLoginMMG = new Button("Log in");
+        Button btnCreateAccountMMG = new Button("Create Account");
+        Button btnViewLeaderboardMMG = new Button("Leaderboard");
+        
+        btnJoinGameMMG.setMinWidth(mainmenuWidth);
+        btnJoinGameMMG.setMinHeight(buttonHeight);
+        btnLoginMMG.setMinWidth(mainmenuWidth);
+        btnLoginMMG.setMinHeight(buttonHeight);
+        btnCreateAccountMMG.setMinWidth(mainmenuWidth);
+        btnCreateAccountMMG.setMinHeight(buttonHeight);
+        btnViewLeaderboardMMG.setMinWidth(mainmenuWidth);
+        btnViewLeaderboardMMG.setMinHeight(buttonHeight);
+        
+        HBox hBoxSpecialization = new HBox();
+        hBoxSpecialization.setSpacing(15);
+        
+        ToggleGroup tGroupspecialization = new ToggleGroup();
+        
+        RadioButton rbBlaster = new RadioButton("Blaster");
+        RadioButton rbRoller = new RadioButton("Roller");
+        RadioButton rbHeavy = new RadioButton("Heavy");
+
+        rbBlaster.setToggleGroup(tGroupspecialization);
+        rbRoller.setToggleGroup(tGroupspecialization);
+        rbHeavy.setToggleGroup(tGroupspecialization);
+        rbBlaster.setSelected(true);
+
+        hBoxSpecialization.getChildren().add(rbBlaster);
+        hBoxSpecialization.getChildren().add(rbRoller);
+        hBoxSpecialization.getChildren().add(rbHeavy);
+        
+        vBoxMMG.getChildren().add(lblNicknameMMG);
+        vBoxMMG.getChildren().add(tfNicknameMMG);
+        vBoxMMG.getChildren().add(hBoxSpecialization);
+        vBoxMMG.getChildren().add(btnJoinGameMMG);
+        vBoxMMG.getChildren().add(btnLoginMMG);
+        vBoxMMG.getChildren().add(btnCreateAccountMMG);
+        vBoxMMG.getChildren().add(btnViewLeaderboardMMG);
+        
+        //1.2 Create Account (CA)
+        VBox vBoxCA = new VBox();
+        BorderPane.setMargin(vBoxCA, new Insets(350, 0, 0, 150));
+        vBoxCA.setSpacing(mainmenuSpacing);
+        vBoxCA.setId("mainmenu");
+        vBoxCA.setMinWidth(mainmenuWidth);
+        vBoxCA.setMaxHeight(mainmenuHeight);
+        
+        Label lblNicknameCA = new Label("Nickname:");
+        TextField tfNicknameCA = new TextField();
+        Label lblUserNameCA = new Label("Name:");
+        TextField tfUserNameCA = new TextField();
+        Label lblPasswordCA = new Label("Password:");
+        Label lblPasswordRepeatCA = new Label("Repeat password:");
+        PasswordField pfCA = new PasswordField();
+        PasswordField pfRepeatCA = new PasswordField();
+        Button btnCreateAccountCA = new Button("Create account");
+        Button btnBackCA = new Button("Start menu");
+        
+        btnCreateAccountCA.setMinWidth(mainmenuWidth);
+        btnCreateAccountCA.setMinHeight(buttonHeight);
+        btnBackCA.setMinWidth(mainmenuWidth);
+        btnBackCA.setMinHeight(buttonHeight);
+
+        vBoxCA.getChildren().add(lblNicknameCA);
+        vBoxCA.getChildren().add(tfNicknameCA);
+        vBoxCA.getChildren().add(lblUserNameCA);
+        vBoxCA.getChildren().add(tfUserNameCA);
+        vBoxCA.getChildren().add(lblPasswordCA);
+        vBoxCA.getChildren().add(pfCA);
+        vBoxCA.getChildren().add(lblPasswordRepeatCA);
+        vBoxCA.getChildren().add(pfRepeatCA);
+        vBoxCA.getChildren().add(btnCreateAccountCA);
+        vBoxCA.getChildren().add(btnBackCA);
+        
+        
+        //1.3 Log in (LI)
+        VBox vBoxLI = new VBox();
+        BorderPane.setMargin(vBoxLI, new Insets(350, 0, 0, 150));
+        vBoxLI.setSpacing(mainmenuSpacing);
+        vBoxLI.setId("mainmenu");
+        vBoxLI.setMinWidth(mainmenuWidth);
+        vBoxLI.setMaxHeight(mainmenuHeight);
+        
+        Button btnLogInLI = new Button("Log in");
+        Label lblUserNameLI = new Label("Name:");
+        TextField tfUserNameLI = new TextField();
+        Label lblPasswordLI = new Label("Password:");
+        PasswordField pfLI = new PasswordField();
+        Button btnBackLI = new Button("Start Menu");
+        
+        btnLogInLI.setMinWidth(mainmenuWidth);
+        btnLogInLI.setMinHeight(buttonHeight);
+        btnBackLI.setMinWidth(mainmenuWidth);
+        btnBackLI.setMinHeight(buttonHeight);
+
+        vBoxLI.getChildren().add(lblUserNameLI);
+        vBoxLI.getChildren().add(tfUserNameLI);
+        vBoxLI.getChildren().add(lblPasswordLI);
+        vBoxLI.getChildren().add(pfLI);
+        vBoxLI.getChildren().add(btnLogInLI);
+        vBoxLI.getChildren().add(btnBackLI);
+        
+        //2. Game
+        BorderPane gameBox = new BorderPane();
+        Scene gameScene = new Scene(gameBox);
+        gameScene.getStylesheets().add(("application/gui/GUICSS.css"));
+        
+        canvas = new Canvas(CANVAS_START_WIDTH, CANVAS_START_HEIGHT);
+
+        Button quitBtn = new Button("Quit game");
+        
+        quitBtn.setMinWidth(mainmenuWidth);
+        quitBtn.setMinHeight(buttonHeight);
+
+        gameBox.setCenter(canvas);
+        gameBox.setBottom(quitBtn);
+        BorderPane.setAlignment(canvas, Pos.TOP_LEFT);
+        BorderPane.setAlignment(quitBtn, Pos.TOP_LEFT);
+
+        /*
+        scale = new Scale();
+        scale.xProperty().bind(gameScene.widthProperty().divide(WINDOW_START_WIDTH));
+        scale.yProperty().bind(gameScene.heightProperty().divide(WINDOW_START_HEIGHT));
+        scale.setPivotX(0);
+        scale.setPivotY(0);
+        //gameBox.getTransforms().add(scale);
+        //gameBox.setBackground(null);
+        // TODO scaling */
+        
+        //3 Leaderboard (LB)
+        BorderPane borderLB = new BorderPane();
+        Scene sceneLB = new Scene(borderLB);
+        sceneLB.getStylesheets().add(("application/gui/GUICSS.css"));
+        
+        VBox vBoxLB = new VBox();
+
+        Button btnBackLB = new Button("Back");
+        
+        btnBackLB.setMinWidth(mainmenuWidth);
+        btnBackLB.setMinHeight(buttonHeight);
+        
+        vBoxLB.getChildren().add(btnBackLB);
+        
+        borderLB.setLeft(vBoxLB);
+        
+        Label lblTopTextLB = new Label("Only shows scores higher than 100!");
+
+        borderLB.setTop(lblTopTextLB);
+        
+        // Init game things
+        tStage.setScene(sceneMainMenu);
+        gameManager = new GameClient(getRelativeSceneLocation(tStage));
+
+        tStage.heightProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage)); // This only happens once for some reason
+        });
+        tStage.widthProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage));
+        });
+        tStage.xProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage
+            		));
+        });
+        tStage.yProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage));
+        });
+        gameScene.xProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage));
+        });
+        gameScene.yProperty().addListener(e ->
+        {
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage));
+        });
+        
+        //Start things
+        borderMainMenu.setLeft(vBoxMMG);
+        tStage.setScene(sceneMainMenu);
+        tStage.show();
+        
+        // Actions
+        actionGoToMainMenuGuest = actionEvent ->
+        {
+        	borderMainMenu.setLeft(vBoxMMG);
+        	if (tStage.getScene() != sceneMainMenu)
+        	{
+        		tStage.setScene(sceneMainMenu);
+        	}
+        };
+
+        actionGoToLogin = actionEvent ->
+        {
+        	borderMainMenu.setLeft(vBoxLI);
+        };
+        
+        actionGoToCreateAccount = actionEvent ->
+        {
+        	borderMainMenu.setLeft(vBoxCA);
+        };
+        
+        actionGoToLeaderboard = actionEvent ->
+        {
+        	HighscoreLeaderboard hBoard = gameManager.getHighscoreLeaderboard();
+            hBoard.setFocusTraversable(false);
+            borderLB.setCenter(hBoard);
+            BorderPane.setMargin(hBoard, new Insets(12, 12, 12, 12));
+            if (gameManager.getPlayer() != null)
+            {
+            	Player client = gameManager.getPlayer();
+                Label you = new Label("YOU:    " + client.getNickname() + " [" + client.getId() + "]    | Score: "
+                          + client.getHighscore());
+                borderLB.setBottom(you);
+            }
+            tStage.setScene(sceneLB);
+        };
+        
+        actionLogin = actionEvent ->
+        {
+            // TODO login
+        };
+        
+        actionCreateAccount = actionEvent ->
+        {
+            gameManager.createAccount(tfUserNameCA.getText(), tfNicknameCA.getText(), pfCA.getText().toCharArray(),
+                    pfRepeatCA.getText().toCharArray());
+            borderMainMenu.setLeft(vBoxMMG);
+            
+        };
+        
+        actionJoinGame = actionEvent ->
+        {
+        	Specializations spec;
+            if (rbRoller.isSelected())
+            {
+                spec = Specializations.ROLLER;
+            }
+            else if (rbHeavy.isSelected())
+            {
+                spec = Specializations.HEAVY;
+            }
+            else // Blaster is default, if something goes wrong with radio
+                 // buttons
+            {
+                spec = Specializations.BLASTER;
+            }
+
+            tStage.setScene(gameScene);
+            gameManager.joinAsGuest(gameBox, tfNicknameMMG.getText(), spec);
+            gameManager.getMap().addObserver(this);
+            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(tStage));
+            gameBox.requestFocus();
+        };
+
+        actionQuitGame = actionEvent ->
+        {
+            gameManager.quitGame();
+            tStage.setScene(sceneMainMenu);
+        };
+        
+        actionQuit = new EventHandler<WindowEvent>()
         {
             public void handle(WindowEvent we)
             {
                 gameManager.quitGame();
                 System.exit(0);
             }
-        });
-
-        BorderPane startMenuRoot = new BorderPane();
-        startMenu = new Scene(startMenuRoot);
-
-        gameBox = new BorderPane();
-        Scene gameScene = new Scene(gameBox);
-
-        BorderPane createAccountRoot = new BorderPane();
-        BorderPane lohInRoot = new BorderPane();
-
-        theStage.setScene(startMenu);
-
-        gameManager = new GameClient(getRelativeSceneLocation(theStage));
-
-        scale = new Scale();
-        scale.xProperty().bind(gameScene.widthProperty().divide(WINDOW_START_WIDTH));
-        scale.yProperty().bind(gameScene.heightProperty().divide(WINDOW_START_HEIGHT));
-        scale.setPivotX(0);
-        scale.setPivotY(0);
-        // gameBox.getTransforms().add(scale);
-        // gameBox.setBackground(null);
-        // TODO scaling
-
-        theStage.heightProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage)); // This
-                                                                                      // only
-                                                                                      // happens
-                                                                                      // once
-                                                                                      // for
-                                                                                      // some
-                                                                                      // reason.
-        });
-        theStage.widthProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-        });
-        theStage.xProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-        });
-        theStage.yProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-        });
-        gameScene.xProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-        });
-        gameScene.yProperty().addListener(e ->
-        {
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-        });
-        Image image = new Image("images/frontpage.png");
-        BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
-        // new BackgroundImage(image, repeatX, repeatY, position, size)
-        BackgroundImage backgroundImage = new BackgroundImage(image, BackgroundRepeat.REPEAT,
-                BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, backgroundSize);
-        // new Background(images...)
-        Background background = new Background(backgroundImage);
-        startMenuRoot.setBackground(background);
-
-        RadioButton chooseBlaster = new RadioButton("Blaster");
-        RadioButton chooseRoller = new RadioButton("Roller");
-        RadioButton chooseHeavy = new RadioButton("Heavy");
-
-        final ToggleGroup specializationGroup = new ToggleGroup();
-
-        chooseBlaster.setToggleGroup(specializationGroup);
-        chooseRoller.setToggleGroup(specializationGroup);
-        chooseHeavy.setToggleGroup(specializationGroup);
-
-        chooseBlaster.setSelected(true);
-
-        HBox specializationBox = new HBox();
-        specializationBox.setSpacing(9);
-        specializationBox.getChildren().add(chooseBlaster);
-        specializationBox.getChildren().add(chooseRoller);
-        specializationBox.getChildren().add(chooseHeavy);
-
-        Label lblNickname = new Label("Nickname:");
-        TextField tfNickname = new TextField();
-        Button loginStart = new Button("Log in");
-        Button createStart = new Button("Create Account");
-        theStage.getIcons().add(new Image("images/ball_red.png"));
-        VBox mainButtonBox = new VBox();
-        mainButtonBox.setSpacing(5);
-        Button joinBtn = new Button("Join game");
-
-        Button viewLB = new Button("Leaderboard");
-        viewLB.setPrefSize(150, 50);
-        viewLB.setId("viewLB");
-        viewLB.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-
-        BorderPane lbBorder = new BorderPane();
-        VBox lbBox = new VBox();
-        Scene lbScene = new Scene(lbBorder);
-
-        Button lbBack = new Button("Start menu");
-        lbBox.getChildren().add(lbBack);
-        lbBorder.setLeft(lbBox);
-        lbBack.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-
-        Label topText = new Label("Only shows scores higher than 100!");
-        topText.setStyle("-fx-font-size: 20pt;-fx-font-family: Segoe UI Semibold;");
-
-        viewLB.setOnAction(ActionEvent ->
-        {
-            HighscoreLeaderboard hBoard = gameManager.getHighscoreLeaderboard();
-            hBoard.setFocusTraversable(false);
-            lbBorder.setCenter(hBoard);
-            if (gameManager.getPlayer() != null)
-            {
-                Player client = gameManager.getPlayer();
-                Label you = new Label("YOU:    " + client.getNickname() + " [" + client.getId() + "]    | Score: "
-                        + client.getHighscore());
-
-                you.setStyle("-fx-font-size: 15pt;-fx-font-family: Segoe UI Semibold;");
-                lbBorder.setBottom(you);
-            }
-
-            BorderPane.setMargin(hBoard, new Insets(12, 12, 12, 12));
-
-            lbBorder.setTop(topText);
-            theStage.setScene(lbScene);
-
-            lbBack.setOnAction(ActionEvent1 ->
-            {
-                theStage.setScene(startMenu);
-                startMenuRoot.setLeft(mainButtonBox);
-
-                BorderPane.setMargin(mainButtonBox, new Insets(350, 0, 0, 150));
-            });
-        });
-
-        joinBtn.setPrefSize(150, 50);
-        tfNickname.setPrefSize(150, 20);
-        joinBtn.setId("joinBtn");
-        joinBtn.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-        lblNickname.setId("lblNickname");
-        lblNickname.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-        createStart.setId("CreateStart");
-        createStart.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-        loginStart.setId("loginStart");
-        loginStart.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-
-        joinBtn.setOnAction(ActionEvent ->
-        {
-            Specializations spec;
-            if (chooseRoller.isSelected())
-            {
-                spec = Specializations.ROLLER;
-            }
-            else if (chooseHeavy.isSelected())
-            {
-                spec = Specializations.HEAVY;
-            }
-            else // Blaster is default, if something goes wrong with radio
-                 // buttons
-            {
-                spec = Specializations.BLASTER;
-            }
-
-            theStage.setScene(gameScene);
-            gameManager.joinAsGuest(gameBox, tfNickname.getText(), spec);
-            gameManager.getMap().addObserver(this);
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-            gameBox.requestFocus();
-
-        });
-        tfNickname.setOnAction(ActionEvent ->
-        {
-            Specializations spec;
-            if (chooseRoller.isSelected())
-            {
-                spec = Specializations.ROLLER;
-            }
-            else if (chooseHeavy.isSelected())
-            {
-                spec = Specializations.HEAVY;
-            }
-            else // Blaster is default, if something goes wrong with radio
-                 // buttons
-            {
-                spec = Specializations.BLASTER;
-            }
-            theStage.setScene(gameScene);
-            gameManager.joinAsGuest(gameBox, tfNickname.getText(), spec);
-            gameManager.setSceneRelativeLocation(getRelativeSceneLocation(theStage));
-            gameBox.requestFocus();
-
-        });
-
-        mainButtonBox.getChildren().add(lblNickname);
-        mainButtonBox.getChildren().add(tfNickname);
-        mainButtonBox.getChildren().add(specializationBox);
-        mainButtonBox.getChildren().add(joinBtn);
-        mainButtonBox.getChildren().add(loginStart);
-        mainButtonBox.getChildren().add(createStart);
-        mainButtonBox.getChildren().add(viewLB);
-        startMenuRoot.setLeft(mainButtonBox);
-
-        createStart.setOnAction(ActionEvent ->
-        {
-            VBox createAccountButtonBox = new VBox();
-            Label lblNickname2 = new Label("Nickname:");
-            TextField tfNickname2 = new TextField();
-            Label lblUserName = new Label("Name:");
-            TextField tfUserName = new TextField();
-            Label lblPassword = new Label("Password:");
-            Label lblPassword2 = new Label("Repeat password:");
-            PasswordField pf = new PasswordField();
-            PasswordField pf2 = new PasswordField();
-            Button createBtn = new Button("Create account");
-            Button back = new Button("Start menu");
-
-            createBtn.setId("join-yyyyy");
-            createBtn.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-            lblUserName.setId("join-game");
-            lblUserName.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-            lblPassword.setId("join-game");
-            lblPassword.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-            lblPassword2.setId("join-game");
-            lblPassword2.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-            back.setId("join-game");
-            back.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-
-            createAccountButtonBox.getChildren().add(lblNickname2);
-            createAccountButtonBox.getChildren().add(tfNickname2);
-            createAccountButtonBox.getChildren().add(lblUserName);
-            createAccountButtonBox.getChildren().add(tfUserName);
-            createAccountButtonBox.getChildren().add(lblPassword);
-            createAccountButtonBox.getChildren().add(pf);
-            createAccountButtonBox.getChildren().add(lblPassword2);
-            createAccountButtonBox.getChildren().add(pf2);
-            createAccountButtonBox.getChildren().add(createBtn);
-            createAccountButtonBox.getChildren().add(back);
-
-            startMenuRoot.setLeft(createAccountButtonBox);
-            BorderPane.setMargin(createAccountButtonBox, new Insets(350, 0, 0, 150));
-
-            createBtn.setOnAction(ActionEvent1 ->
-            {
-                gameManager.createAccount(tfUserName.getText(), tfNickname2.getText(), pf.getText().toCharArray(),
-                        pf2.getText().toCharArray());
-                startMenuRoot.setLeft(mainButtonBox);
-                BorderPane.setMargin(mainButtonBox, new Insets(350, 0, 0, 150));
-            });
-
-            back.setOnAction(ActionEvent1 ->
-            {
-                startMenuRoot.setLeft(mainButtonBox);
-                BorderPane.setMargin(mainButtonBox, new Insets(350, 0, 0, 150));
-            });
-        });
-
-        loginStart.setOnAction(ActionEvent ->
-        {
-            VBox loginButtonBox = new VBox();
-            Button logInBtn = new Button("Log in");
-            Label lblUserName2 = new Label("Name:");
-            TextField tfUserName2 = new TextField();
-            Label lblPassword2 = new Label("Password:");
-            PasswordField pf3 = new PasswordField();
-            Button back2 = new Button("Start Menu");
-
-            logInBtn.setId("join-game");
-            logInBtn.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-            back2.setId("join-game");
-            back2.setStyle("-fx-font: 20 arial; -fx-base: #ff0717;");
-
-            loginButtonBox.getChildren().add(lblUserName2);
-            loginButtonBox.getChildren().add(tfUserName2);
-            loginButtonBox.getChildren().add(lblPassword2);
-            loginButtonBox.getChildren().add(pf3);
-            loginButtonBox.getChildren().add(logInBtn);
-            loginButtonBox.getChildren().add(back2);
-
-            startMenuRoot.setLeft(loginButtonBox);
-            BorderPane.setMargin(loginButtonBox, new Insets(350, 0, 0, 150));
-
-            logInBtn.setOnAction(ActionEvent1 ->
-            {
-                // TODO login
-            });
-
-            back2.setOnAction(ActionEvent1 ->
-            {
-                startMenuRoot.setLeft(mainButtonBox);
-                BorderPane.setMargin(mainButtonBox, new Insets(350, 0, 0, 150));
-            });
-        });
-
-        BorderPane.setMargin(mainButtonBox, new Insets(350, 0, 0, 150));
-
-        Button quitBtn = new Button("Quit game");
-        quitBtn.setPrefSize(80, 40);
-        quitBtn.setId("quit-game");
-
-        quitBtn.setOnAction(ActionEvent ->
-        {
-            gameManager.quitGame();
-            theStage.setScene(startMenu);
-        });
-
-        canvas = new Canvas(CANVAS_START_WIDTH, CANVAS_START_HEIGHT);
-        gameBox.setCenter(canvas);
-        BorderPane.setAlignment(canvas, Pos.TOP_LEFT);
-
-        gameBox.setBottom(quitBtn);
-        BorderPane.setAlignment(quitBtn, Pos.TOP_LEFT);
-        theStage.show();
+        };
+        
+        btnJoinGameMMG.setOnAction(actionJoinGame);
+        btnLoginMMG.setOnAction(actionGoToLogin);
+        btnCreateAccountMMG.setOnAction(actionGoToCreateAccount);
+        btnViewLeaderboardMMG.setOnAction(actionGoToLeaderboard);
+        
+        btnCreateAccountCA.setOnAction(actionCreateAccount);
+        btnBackCA.setOnAction(actionGoToMainMenuGuest);
+        
+        btnLogInLI.setOnAction(actionLogin);
+        btnBackLI.setOnAction(actionGoToMainMenuGuest);
+        
+        btnBackLB.setOnAction(actionGoToMainMenuGuest);
+        
+        quitBtn.setOnAction(actionQuitGame); 
+        
+        tStage.setOnCloseRequest(actionQuit);
     }
+    
 
     @Override
     public void update(Observable arg0, Object arg1)
@@ -452,7 +468,7 @@ public class GUI extends Application implements Observer
                     {
                         System.out.println("Trying to quit...");
                         gameManager.quitGame();
-                        tStage.setScene(startMenu);
+                        tStage.setScene(sceneMainMenu);
                     }
                 }
             });

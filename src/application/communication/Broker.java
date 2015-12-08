@@ -40,10 +40,11 @@ public class Broker extends Observable
     private static final int SERVER_UDP_PORT = 15001;
     private static final int SERVER_TCP_PORT = 15010;
     private DataOutputStream output = null;
-    private int ping = 0; // in ms
-    private Timer pingTimer = new Timer(); 
+    private long ping = 0; // in ms
+    private long lastPing;
     private LightEvent _pingEvent = new LightEvent(1000, () ->
     {
+
         sendPing();
     });
 
@@ -184,11 +185,12 @@ public class Broker extends Observable
             e.printStackTrace();
         }
     }
-    
-    public int getPing()
+
+    public long getPing()
     {
         return ping;
     }
+
     private void sendPing()
     {
         ByteBuffer buffer = ByteBuffer.allocate(20);
@@ -198,10 +200,10 @@ public class Broker extends Observable
         buffer.putInt(Opcodes.PING.getValue());
         buffer.put((byte)2); // ASCII Standard for Start of text
         buffer.put((byte)4); // ASCII Standard for End of transmission
-        pingTimer.start();
+        
+        lastPing = System.currentTimeMillis();
         sendTcp(buffer);
-        ping = (int)pingTimer.getDuration();
-        pingTimer.stop();
+        
     }
 
     /**
@@ -487,6 +489,11 @@ public class Broker extends Observable
                     case SERVER_MESSAGE:
                     {
                         readServerMessage(buffer);
+                        break;
+                    }
+                    case PING:
+                    {
+                        ping = System.currentTimeMillis()-lastPing;
                         break;
                     }
                     default:

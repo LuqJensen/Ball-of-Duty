@@ -20,20 +20,22 @@ import application.engine.entities.specializations.Specializations;
 import application.engine.factories.EntityFactory;
 import application.engine.rendering.ClientMap;
 import application.util.LightEvent;
+import application.util.Observable;
+import application.util.Observation;
 
 /**
- * Handles all networking that isn't web service based and acts as a middleman between server and client objects, such as ClientMap, that needs to
- * communicate with the server.
+ * Handles all networking that isn't web service based and acts as a middleman between server and client objects, such as ClientMap, that
+ * needs to communicate with the server.
  * 
  */
-public class Broker
+public class Broker extends Observable
 {
     private ClientMap map;
     private InetAddress ina;
     private DatagramSocket _socket;
     private Socket tcpSocket;
     private boolean isActive = false;
-    private static final String SERVER_IP = "10.126.24.36";
+    private static final String SERVER_IP = "localhost";
     private static final int SERVER_UDP_PORT = 15001;
     private static final int SERVER_TCP_PORT = 15010;
     private DataOutputStream output = null;
@@ -166,10 +168,18 @@ public class Broker
     /**
      * Stops the brokers listening loop.
      */
-    public void stop()
+    public void deactivate()
     {
         isActive = false;
         _socket.close();
+        try
+        {
+            tcpSocket.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void sendPing()
@@ -236,8 +246,7 @@ public class Broker
 
         for (int i = 0; i < sessionId.length; ++i)
         {
-            if (b[i] != sessionId[i])
-                throw new Error("Rest in pepperoni m9");
+            if (b[i] != sessionId[i]) throw new Error("Rest in pepperoni m9");
         }
 
         ByteBuffer buffer = ByteBuffer.allocate(256);
@@ -254,8 +263,7 @@ public class Broker
 
         for (int i = 0; i < sessionId.length; ++i)
         {
-            if (b[i] != sessionId[i])
-                throw new Error("Rest in pepperoni m9");
+            if (b[i] != sessionId[i]) throw new Error("Rest in pepperoni m9");
         }
     }
 
@@ -277,7 +285,8 @@ public class Broker
                 }
                 catch (IOException e)
                 {
-                    e.printStackTrace();
+
+                    notifyObservers(Observation.SERVER_OFFLINE);
                 }
 
                 byte[] data = Arrays.copyOf(packet.getData(), packet.getLength());
@@ -417,6 +426,7 @@ public class Broker
             }
             catch (IOException e)
             {
+                this.notifyObservers(Observation.SERVER_OFFLINE);
                 e.printStackTrace();
             }
         }).start();
@@ -464,6 +474,11 @@ public class Broker
                         readDestroyedObject(buffer);
                         break;
                     }
+                    case SERVER_MESSAGE:
+                    {
+                        readServerMessage(buffer);
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -479,6 +494,12 @@ public class Broker
         {
             e.printStackTrace();
         }
+    }
+
+    private void readServerMessage(ByteBuffer input)
+    {
+
+        map.writeServerMessage(readString(input));
     }
 
     /**
@@ -506,6 +527,24 @@ public class Broker
         map.destroyGameObject(objectId);
     }
 
+    private String readString(ByteBuffer input)
+    {
+        int nicknameLength = (int)input.get();
+        if (nicknameLength > 0)
+        {
+            char[] nickname = new char[nicknameLength];
+            for (int i = 0; i < nickname.length; ++i)
+            {
+                nickname[i] = (char)(input.get());
+            }
+            return new String(nickname);
+        }
+        else
+        {
+            return new String();
+        }
+    }
+
     /**
      * Handles new players created by the server.
      * 
@@ -517,20 +556,9 @@ public class Broker
                                                  // player instead
     {
         GameObjectDAO data = new GameObjectDAO();
-        int nicknameLength = (int)input.get();
-        if (nicknameLength > 0)
-        {
-            char[] nickname = new char[nicknameLength];
-            for (int i = 0; i < nickname.length; ++i)
-            {
-                nickname[i] = (char)(input.get());
-            }
-            data.nickname = new String(nickname);
-        }
-        else
-        {
-            data.nickname = new String();
-        }
+
+        data.nickname = readString(input);
+
         data.objectId = input.getInt();
         data.x = input.getDouble();
         data.y = input.getDouble();

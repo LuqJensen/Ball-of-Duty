@@ -31,6 +31,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -66,10 +67,10 @@ public class ClientMap extends Observable
     private Affine startingAffine;
     private ConcurrentLinkedQueue<GameObjectDAO> addQueue;
     private ConcurrentMap<Integer, String> killNotis;
+    private String serverMessage;
     private int killNotisCounter = 0;
     private double secondsSinceLastUpdate = 0;
     private int fps = 0;
-    private ArrayList<Double> drawtimes;
 
     /**
      * Creates a client map defining the serverMap its based upon, the gamebox it should be drawn in, the broker it uses to communicate with the
@@ -86,7 +87,6 @@ public class ClientMap extends Observable
      */
     public ClientMap(GameDTO serverGame, Pane gameBox, Broker broker, Player clientPlayer)
     {
-        drawtimes = new ArrayList<>();
         mapPoint = new TranslatedPoint(0, 0);
         mapWidth = serverGame.getMapWidth();
         mapHeight = serverGame.getMapHeight();
@@ -141,13 +141,11 @@ public class ClientMap extends Observable
         LightEvent uiPanelEvent = new LightEvent(250, () ->
         {
             leaderboard.refresh();
-            double total = 0;
-            for (double d : drawtimes)
-            {
-                total += d;
-            }
-            fps = (int)(1 / (total / drawtimes.size()));
-            drawtimes.clear();
+        });
+        LightEvent fpsEvent = new LightEvent(1000, () ->
+        {
+            fps = frames;
+            frames = 0;
         });
 
         animationTimer = new AnimationTimer()
@@ -164,7 +162,6 @@ public class ClientMap extends Observable
                 }
 
                 secondsSinceLastUpdate = ((double)(currentNanoTime - lastNanoTime)) / (NANOSECONDS_TO_MILLISECONDS * MILLISECONDS_TO_SECONDS);
-                drawtimes.add(secondsSinceLastUpdate);
                 lastNanoTime = currentNanoTime;
 
                 double translateX = clientChar.getBody().getCenter().getX() - canvas.getWidth() / 2;
@@ -224,13 +221,19 @@ public class ClientMap extends Observable
                     gc.strokeText(s, 640, killNotificationY, 400);
                     killNotificationY += 20;
                 }
-
-                ++frames; // fps is reliant on the refresh rate.
+                gc.setFont(Font.font("Impact", 20));
+                gc.setFill(Color.BLACK);
+                gc.fillText(serverMessage, canvas.getWidth()/2, canvas.getHeight()-200);
+                gc.setFont(Font.font("Verdana", 12));
+                ++frames;
                 canvas.requestFocus();
             }
         };
         animationTimer.start();
-
+//        for(String s : Font.getFontNames())
+//        {
+//            System.out.println(s);
+//        }
         updateThread = new Thread(() ->
         {
             long lastUpdate = System.nanoTime();
@@ -244,6 +247,7 @@ public class ClientMap extends Observable
                 Platform.runLater(() ->
                 {
                     uiPanelEvent.update(deltaTime);
+                    fpsEvent.update(deltaTime);
                 });
 
                 for (GameObject go : gameObjects.values())
@@ -275,7 +279,7 @@ public class ClientMap extends Observable
         mapActive = false;
         animationTimer.stop();
         updateThread.interrupt();
-        broker.stop();
+        broker.deactivate();
     }
 
     /**
@@ -484,5 +488,24 @@ public class ClientMap extends Observable
     {
         gc.setTransform(startingAffine);
         gc.scale(xFactor, yFactor);
+    }
+
+    public void writeServerMessage(String readString)
+    {
+        new Thread(() ->
+        {
+            serverMessage = "SERVER: " + readString;
+            try
+            {
+                Thread.sleep(6000);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            serverMessage = null;
+        }).start();
+        
     }
 }

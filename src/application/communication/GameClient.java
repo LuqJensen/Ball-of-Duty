@@ -37,7 +37,6 @@ public class GameClient extends Observable
     private Account account;
     private CharacterController characterController;
     private TranslatedPoint sceneRelativeLocation;
-    private Broker broker;
     private boolean inGame = false;
     IBoDService ibs;
 
@@ -158,7 +157,7 @@ public class GameClient extends Observable
         }
 
     }
-    private void brokerException()
+    private void brokerError()
     {
         if(inGame)
         {
@@ -185,12 +184,14 @@ public class GameClient extends Observable
         System.out.println("trying to join game");
         try
         {
-            if(broker != null)
+            
+            if(cMap != null)
             {
-                broker.unregisterAll(this);
+                cMap.getBroker().unregisterAll(this);
             }
-            broker = new Broker();
-            broker.register(Observation.SERVER_OFFLINE, this, (Observable, data)->brokerException());
+
+            Broker  broker = new Broker();
+            broker.register(Observation.SERVER_OFFLINE, this, (Observable, data)->brokerError());
             
             GameDTO map = ibs.joinGame(clientPlayer.getId(), spec.getValue());
             try

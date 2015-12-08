@@ -22,6 +22,7 @@ import application.engine.rendering.ClientMap;
 import application.util.LightEvent;
 import application.util.Observable;
 import application.util.Observation;
+import application.util.Timer;
 
 /**
  * Handles all networking that isn't web service based and acts as a middleman between server and client objects, such as ClientMap, that
@@ -35,10 +36,12 @@ public class Broker extends Observable
     private DatagramSocket _socket;
     private Socket tcpSocket;
     private boolean isActive = false;
-    private static final String SERVER_IP = "localhost";
+    private static final String SERVER_IP = "85.218.183.174";
     private static final int SERVER_UDP_PORT = 15001;
     private static final int SERVER_TCP_PORT = 15010;
     private DataOutputStream output = null;
+    private int ping = 0; // in ms
+    private Timer pingTimer = new Timer(); 
     private LightEvent _pingEvent = new LightEvent(1000, () ->
     {
         sendPing();
@@ -181,7 +184,11 @@ public class Broker extends Observable
             e.printStackTrace();
         }
     }
-
+    
+    public int getPing()
+    {
+        return ping;
+    }
     private void sendPing()
     {
         ByteBuffer buffer = ByteBuffer.allocate(20);
@@ -191,7 +198,10 @@ public class Broker extends Observable
         buffer.putInt(Opcodes.PING.getValue());
         buffer.put((byte)2); // ASCII Standard for Start of text
         buffer.put((byte)4); // ASCII Standard for End of transmission
+        pingTimer.start();
         sendTcp(buffer);
+        ping = (int)pingTimer.getDuration();
+        pingTimer.stop();
     }
 
     /**
@@ -529,15 +539,15 @@ public class Broker extends Observable
 
     private String readString(ByteBuffer input)
     {
-        int nicknameLength = (int)input.get();
-        if (nicknameLength > 0)
+        int stringLength = (int)input.get();
+        if (stringLength > 0)
         {
-            char[] nickname = new char[nicknameLength];
-            for (int i = 0; i < nickname.length; ++i)
+            char[] string = new char[stringLength];
+            for (int i = 0; i < string.length; ++i)
             {
-                nickname[i] = (char)(input.get());
+                string[i] = (char)(input.get());
             }
-            return new String(nickname);
+            return new String(string);
         }
         else
         {

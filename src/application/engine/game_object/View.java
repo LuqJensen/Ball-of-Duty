@@ -1,7 +1,6 @@
 package application.engine.game_object;
 
 import application.engine.entities.BoDCharacter;
-import application.engine.entities.Bullet;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;

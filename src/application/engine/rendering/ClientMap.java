@@ -182,13 +182,15 @@ public class ClientMap extends Observable
                 }
                 if (clientChar.getWeapon().getReloading())
                 {
+                    gc.setTextAlign(TextAlignment.CENTER);
                     gc.strokeText("Reloading", clientChar.getBody().getCenter().getTranslatedX(),
-                            clientChar.getBody().getPosition().getTranslatedY() - 20, 100);
+                            clientChar.getBody().getPosition().getTranslatedY() - 20);
                 }
                 if (!clientChar.isDestroyed())
                 {
                     clientChar.updateWithCollision(secondsSinceLastUpdate, gc, gameObjects);
                 }
+                gc.setTextAlign(TextAlignment.LEFT);
                 gc.setLineWidth(1);
                 gc.setFont(Font.font("Verdana", 12));
 
@@ -202,8 +204,8 @@ public class ClientMap extends Observable
                 {
                     gc.strokeText("Health: DEAD", 10, 60, 200);
                 }
-                gc.strokeText(clientChar.getWeapon().getMagazineSize() + "/" + clientChar.getWeapon().getMagazineMaxSize(), 10, 80, 200);
-
+                gc.strokeText("Ammo: "+clientChar.getWeapon().getMagazineSize() + "/" + clientChar.getWeapon().getMagazineMaxSize(), 10, 80, 200);
+                gc.strokeText("Ping: "+ broker.getPing()+" ms", 10, 100, 200);
                 int LeaderboardY = 20;
                 ObservableList<BoDCharacter> bodChars = leaderboard.getItems();
                 gc.setTextAlign(TextAlignment.RIGHT);
@@ -227,13 +229,9 @@ public class ClientMap extends Observable
                 gc.setFont(Font.font("Verdana", 12));
                 ++frames;
                 canvas.requestFocus();
-            }
+            } 
         };
         animationTimer.start();
-//        for(String s : Font.getFontNames())
-//        {
-//            System.out.println(s);
-//        }
         updateThread = new Thread(() ->
         {
             long lastUpdate = System.nanoTime();
@@ -490,6 +488,11 @@ public class ClientMap extends Observable
         gc.scale(xFactor, yFactor);
     }
 
+    public Broker getBroker()
+    {
+        return broker;
+    }
+    
     public void writeServerMessage(String readString)
     {
         new Thread(() ->

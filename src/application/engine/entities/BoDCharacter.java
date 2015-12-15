@@ -1,13 +1,7 @@
 package application.engine.entities;
 
-import application.engine.game_object.Body;
 import application.engine.game_object.GameObject;
-import application.engine.game_object.Health;
-import application.engine.game_object.View;
-import application.engine.game_object.Weapon;
-import application.engine.game_object.physics.Physics;
-import application.engine.rendering.TranslatedPoint;
-import javafx.scene.image.Image;
+import application.engine.game_object.components.Body;
 
 /**
  * Characters in the game consists of the balls that players control.
@@ -68,7 +62,6 @@ public abstract class BoDCharacter extends GameObject
         return String.format("%s | Score: %.2f", _nickname, _score);
     }
 
-   
     public abstract void updateStats();
 
 }

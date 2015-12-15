@@ -3,10 +3,10 @@ package application.engine.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-import application.engine.game_object.Body;
 import application.engine.game_object.GameObject;
-import application.engine.game_object.View;
-import application.engine.game_object.physics.Physics;
+import application.engine.game_object.components.Body;
+import application.engine.game_object.components.View;
+import application.engine.game_object.components.physics.Physics;
 import application.engine.rendering.TranslatedPoint;
 import application.util.LightEvent;
 import application.util.Timer;

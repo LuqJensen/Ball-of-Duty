@@ -1,10 +1,11 @@
-package application.engine.game_object;
+package application.engine.game_object.components;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import application.engine.entities.Bullet;
 import application.engine.entities.Bullet.Type;
+import application.engine.game_object.GameObject;
 import application.engine.rendering.TranslatedPoint;
 import application.util.Observable;
 import application.util.Observation;

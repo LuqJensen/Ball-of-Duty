@@ -15,7 +15,7 @@ import application.engine.entities.specializations.Heavy;
 import application.engine.entities.specializations.Roller;
 import application.engine.entities.specializations.Specializations;
 import application.engine.game_object.GameObject;
-import application.engine.game_object.Weapon;
+import application.engine.game_object.components.Weapon;
 import application.engine.rendering.TranslatedPoint;
 import application.util.Resources;
 import application.util.Vector2;

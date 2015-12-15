@@ -1,4 +1,4 @@
-package application.engine.game_object.physics;
+package application.engine.game_object.components.physics;
 
 import java.util.ArrayList;
 import java.util.HashSet;

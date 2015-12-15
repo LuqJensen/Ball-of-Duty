@@ -1,8 +1,8 @@
 package application.engine.entities;
 
-import application.engine.game_object.Body;
 import application.engine.game_object.GameObject;
-import application.engine.game_object.View;
+import application.engine.game_object.components.Body;
+import application.engine.game_object.components.View;
 import application.engine.rendering.TranslatedPoint;
 import javafx.scene.image.Image;
 

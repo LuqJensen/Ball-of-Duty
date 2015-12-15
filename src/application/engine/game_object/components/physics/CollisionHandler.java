@@ -1,8 +1,7 @@
-package application.engine.game_object.physics;
+package application.engine.game_object.components.physics;
 
 import application.engine.entities.Bullet;
-import application.engine.game_object.Body;
-import application.engine.game_object.Body;
+import application.engine.game_object.components.Body;
 import application.engine.rendering.TranslatedPoint;
 import application.util.Vector2;
 

@@ -2,7 +2,11 @@ package application.engine.game_object;
 
 import java.util.concurrent.ConcurrentMap;
 
-import application.engine.game_object.physics.Physics;
+import application.engine.game_object.components.Body;
+import application.engine.game_object.components.Health;
+import application.engine.game_object.components.View;
+import application.engine.game_object.components.Weapon;
+import application.engine.game_object.components.physics.Physics;
 import application.util.Observable;
 import application.util.Observation;
 import application.util.Vector2;

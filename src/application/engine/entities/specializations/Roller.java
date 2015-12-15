@@ -1,11 +1,11 @@
 package application.engine.entities.specializations;
 
 import application.engine.entities.BoDCharacter;
-import application.engine.game_object.Body;
-import application.engine.game_object.Health;
-import application.engine.game_object.View;
-import application.engine.game_object.Weapon;
-import application.engine.game_object.physics.Physics;
+import application.engine.game_object.components.Body;
+import application.engine.game_object.components.Health;
+import application.engine.game_object.components.View;
+import application.engine.game_object.components.Weapon;
+import application.engine.game_object.components.physics.Physics;
 import application.engine.rendering.TranslatedPoint;
 import application.util.Resources;
 import javafx.application.Platform;

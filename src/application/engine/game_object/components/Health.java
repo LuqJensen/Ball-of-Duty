@@ -1,4 +1,6 @@
-package application.engine.game_object;
+package application.engine.game_object.components;
+
+import application.engine.game_object.GameObject;
 
 /**
  * Handles everything related to the characters health

@@ -1,6 +1,7 @@
-package application.engine.game_object;
+package application.engine.game_object.components;
 
 import application.engine.entities.BoDCharacter;
+import application.engine.game_object.GameObject;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;

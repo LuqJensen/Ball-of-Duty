@@ -24,8 +24,8 @@ import application.util.Observable;
 import application.util.Observation;
 
 /**
- * Handles all networking that isn't web service based and acts as a middleman between server and client objects, such as ClientMap, that
- * needs to communicate with the server.
+ * Handles all networking that isn't web service based and acts as a middleman between server and client objects, such as ClientMap, that needs to
+ * communicate with the server.
  * 
  */
 public class Broker extends Observable
@@ -250,7 +250,8 @@ public class Broker extends Observable
 
         for (int i = 0; i < sessionId.length; ++i)
         {
-            if (b[i] != sessionId[i]) throw new Error("Rest in pepperoni m9");
+            if (b[i] != sessionId[i])
+                throw new Error("Rest in pepperoni m9");
         }
 
         ByteBuffer buffer = ByteBuffer.allocate(256);
@@ -267,7 +268,8 @@ public class Broker extends Observable
 
         for (int i = 0; i < sessionId.length; ++i)
         {
-            if (b[i] != sessionId[i]) throw new Error("Rest in pepperoni m9");
+            if (b[i] != sessionId[i])
+                throw new Error("Rest in pepperoni m9");
         }
     }
 
@@ -294,10 +296,8 @@ public class Broker extends Observable
 
                 byte[] data = Arrays.copyOf(packet.getData(), packet.getLength());
 
-                ByteBuffer buffer = ByteBuffer.allocate(1024);
+                ByteBuffer buffer = ByteBuffer.wrap(data);
                 buffer.order(ByteOrder.LITTLE_ENDIAN);
-                buffer.put(data);
-                buffer.rewind();
 
                 try
                 {
@@ -440,10 +440,8 @@ public class Broker extends Observable
 
     private void receiveTCP(byte[] data)
     {
-        ByteBuffer buffer = ByteBuffer.allocate(data.length);
+        ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        buffer.put(data);
-        buffer.rewind();
 
         try
         {

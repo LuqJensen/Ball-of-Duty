@@ -1,0 +1,18 @@
+This guide will assist in setting up an environment from which to develop on the Ball of Duty client.
+For requirements see README.md.
+
+1. Install Java SE with Java EE (Enterprise Edition).
+2. Install Eclipse Java or Eclipse Java EE or your preferred Java IDE.
+
+	The following steps will guide you through the Eclipse setup. This guide might not be helpful for setting up other IDEs.
+
+3. Import the Ball of Duty project into Eclipse.
+4. Right click the project in the navigation pane and choose "New" and then "Other...".
+5. In the pop up window, find Web Services and pick "Web Service Client", choose Next.
+6. Input the WSDL link taken from the Ball of Duty Server in the "Service" Definition field.
+
+	For localhost the link is: http://localhost:8733/Ball_of_Duty_Server/Services/BoDService/?wsdl 
+	If the server is hosted on a remote system the WSDL link is: http://IP:PORT/Ball_of_Duty_Server/Services/BoDService/?wsdl
+
+7. Choose Finish.
+8. The auto generated files have now been downloaded and the environment is setup for developing on the Ball of Duty client.

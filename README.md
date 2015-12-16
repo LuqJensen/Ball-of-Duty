@@ -2,25 +2,22 @@
 [![Issue Stats](http://www.issuestats.com/github/LuqJensen/Ball-of-Duty/badge/pr)](http://www.issuestats.com/github/LuqJensen/Ball-of-Duty)
 
 ## Introduction
-
-USE - Unified Shopping Experience is an offline webshop prototype based mostly in java.
-
-The project is our complete prototype solution to our project case "Electroshoppens Cross-Channel satsning".
+This project is owned by project group 6 on third semester of Software Engineering at University of Southern Denmark.
+BoD - Ball of Duty is a simple 2D multiplayer shooter. This repository represents the frontend of Ball of Duty.
 
 
-## Requirements
+## Requirements for developing
 
-+ Platform: Linux, Windows, Mac(IS NOT CURRENTLY SUPPORTED) or Oracle Solaris
-+ Java SE Development Kit ≥ 8.0.310.13
-+ Java Runtime ≥ 8.0.310
-+ PostgreSQL ≥ 9.4
-+ JavaFX Scene Builder ≥ 2.0
-+ JUnit ≥ 4.10
++ Platform: Linux, Windows, Mac or Oracle Solaris - Linux and Oracle Solaris have not been tested.
++ Java SE Development Kit ≥ 8.0.600.27
++ Java Runtime ≥ 8.0.600.27
++ A Java IDE (the group uses Eclipse Java Mars)
 
-NOTE: Mac IS NOT currently supported, because the software simply does'nt work on Mac. 
-We suspect this is due to a bug within Java Runtime 8.0.x
-Specifically with either JFrames or Lambdas.
-We have not tried to reproduce this bug on other Java versions, due to time limitations.
+
+## Requirements playing using Ball of Duty
+
++ Platform: Linux, Windows, Mac or Oracle Solaris - Linux and Oracle Solaris have not been tested.
++ Java Runtime ≥ 8.0.600.27
 
 ## Install
 
@@ -47,7 +44,5 @@ Fixes are submitted as pull requests via Github.
 [Java SDK, JavaFX](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 [JUnit](http://JUnit.org)
-
-[PostgreSQL](http://www.postgresql.org/download/)
 
 [Java](https://www.java.com/en/)

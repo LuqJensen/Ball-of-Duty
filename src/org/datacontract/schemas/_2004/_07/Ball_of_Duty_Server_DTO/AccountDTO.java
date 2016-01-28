@@ -8,7 +8,7 @@
 package org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO;
 
 public class AccountDTO  implements java.io.Serializable {
-    private java.lang.Integer id;
+    private int id;
 
     private org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO player;
 
@@ -16,7 +16,7 @@ public class AccountDTO  implements java.io.Serializable {
     }
 
     public AccountDTO(
-           java.lang.Integer id,
+           int id,
            org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO player) {
            this.id = id;
            this.player = player;
@@ -28,7 +28,7 @@ public class AccountDTO  implements java.io.Serializable {
      * 
      * @return id
      */
-    public java.lang.Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -38,7 +38,7 @@ public class AccountDTO  implements java.io.Serializable {
      * 
      * @param id
      */
-    public void setId(java.lang.Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -74,9 +74,7 @@ public class AccountDTO  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.id==null && other.getId()==null) || 
-             (this.id!=null &&
-              this.id.equals(other.getId()))) &&
+            this.id == other.getId() &&
             ((this.player==null && other.getPlayer()==null) || 
              (this.player!=null &&
               this.player.equals(other.getPlayer())));
@@ -91,9 +89,7 @@ public class AccountDTO  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getId() != null) {
-            _hashCode += getId().hashCode();
-        }
+        _hashCode += getId();
         if (getPlayer() != null) {
             _hashCode += getPlayer().hashCode();
         }
@@ -111,14 +107,12 @@ public class AccountDTO  implements java.io.Serializable {
         elemField.setFieldName("id");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "Id"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("player");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "Player"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "PlayerDTO"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }

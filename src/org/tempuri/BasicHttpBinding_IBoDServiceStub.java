@@ -53,6 +53,12 @@ public class BasicHttpBinding_IBoDServiceStub extends org.apache.axis.client.Stu
         oper.setReturnQName(new javax.xml.namespace.QName("http://tempuri.org/", "JoinGameResult"));
         oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.Exceptions", "VersionOutdatedFault"),
+                      "org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault",
+                      new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.Exceptions", "VersionOutdatedFault"), 
+                      true
+                     ));
         _operations[1] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -254,6 +260,13 @@ public class BasicHttpBinding_IBoDServiceStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.Exceptions", "VersionOutdatedFault");
+            cachedSerQNames.add(qName);
+            cls = org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
     }
 
     protected org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
@@ -354,7 +367,7 @@ public class BasicHttpBinding_IBoDServiceStub extends org.apache.axis.client.Stu
 }
     }
 
-    public org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameDTO joinGame(java.lang.Integer clientPlayerId, java.lang.Integer clientSpecialization, java.lang.String clientVersion) throws java.rmi.RemoteException {
+    public org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameDTO joinGame(java.lang.Integer clientPlayerId, java.lang.Integer clientSpecialization, java.lang.String clientVersion) throws java.rmi.RemoteException, org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -384,6 +397,14 @@ public class BasicHttpBinding_IBoDServiceStub extends org.apache.axis.client.Stu
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault) {
+              throw (org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault) axisFaultException.detail;
+         }
+   }
   throw axisFaultException;
 }
     }

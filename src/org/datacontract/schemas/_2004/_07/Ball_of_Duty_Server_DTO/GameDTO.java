@@ -8,25 +8,25 @@
 package org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO;
 
 public class GameDTO  implements java.io.Serializable {
-    private java.lang.Integer characterId;
+    private int characterId;
 
-    private java.lang.Integer gameId;
+    private int gameId;
 
     private org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameObjectDTO[] gameObjects;
 
     private java.lang.String ipAddress;
 
-    private java.lang.Integer mapHeight;
+    private int mapHeight;
 
-    private java.lang.Integer mapWidth;
+    private int mapWidth;
 
     private org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO[] players;
 
     private byte[] sessionId;
 
-    private java.lang.Integer tcpPort;
+    private int tcpPort;
 
-    private java.lang.Integer udpPort;
+    private int udpPort;
 
     private java.lang.String version;
 
@@ -34,16 +34,16 @@ public class GameDTO  implements java.io.Serializable {
     }
 
     public GameDTO(
-           java.lang.Integer characterId,
-           java.lang.Integer gameId,
+           int characterId,
+           int gameId,
            org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameObjectDTO[] gameObjects,
            java.lang.String ipAddress,
-           java.lang.Integer mapHeight,
-           java.lang.Integer mapWidth,
+           int mapHeight,
+           int mapWidth,
            org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO[] players,
            byte[] sessionId,
-           java.lang.Integer tcpPort,
-           java.lang.Integer udpPort,
+           int tcpPort,
+           int udpPort,
            java.lang.String version) {
            this.characterId = characterId;
            this.gameId = gameId;
@@ -64,7 +64,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return characterId
      */
-    public java.lang.Integer getCharacterId() {
+    public int getCharacterId() {
         return characterId;
     }
 
@@ -74,7 +74,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param characterId
      */
-    public void setCharacterId(java.lang.Integer characterId) {
+    public void setCharacterId(int characterId) {
         this.characterId = characterId;
     }
 
@@ -84,7 +84,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return gameId
      */
-    public java.lang.Integer getGameId() {
+    public int getGameId() {
         return gameId;
     }
 
@@ -94,7 +94,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param gameId
      */
-    public void setGameId(java.lang.Integer gameId) {
+    public void setGameId(int gameId) {
         this.gameId = gameId;
     }
 
@@ -144,7 +144,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return mapHeight
      */
-    public java.lang.Integer getMapHeight() {
+    public int getMapHeight() {
         return mapHeight;
     }
 
@@ -154,7 +154,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param mapHeight
      */
-    public void setMapHeight(java.lang.Integer mapHeight) {
+    public void setMapHeight(int mapHeight) {
         this.mapHeight = mapHeight;
     }
 
@@ -164,7 +164,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return mapWidth
      */
-    public java.lang.Integer getMapWidth() {
+    public int getMapWidth() {
         return mapWidth;
     }
 
@@ -174,7 +174,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param mapWidth
      */
-    public void setMapWidth(java.lang.Integer mapWidth) {
+    public void setMapWidth(int mapWidth) {
         this.mapWidth = mapWidth;
     }
 
@@ -224,7 +224,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return tcpPort
      */
-    public java.lang.Integer getTcpPort() {
+    public int getTcpPort() {
         return tcpPort;
     }
 
@@ -234,7 +234,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param tcpPort
      */
-    public void setTcpPort(java.lang.Integer tcpPort) {
+    public void setTcpPort(int tcpPort) {
         this.tcpPort = tcpPort;
     }
 
@@ -244,7 +244,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @return udpPort
      */
-    public java.lang.Integer getUdpPort() {
+    public int getUdpPort() {
         return udpPort;
     }
 
@@ -254,7 +254,7 @@ public class GameDTO  implements java.io.Serializable {
      * 
      * @param udpPort
      */
-    public void setUdpPort(java.lang.Integer udpPort) {
+    public void setUdpPort(int udpPort) {
         this.udpPort = udpPort;
     }
 
@@ -290,36 +290,24 @@ public class GameDTO  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
-            ((this.characterId==null && other.getCharacterId()==null) || 
-             (this.characterId!=null &&
-              this.characterId.equals(other.getCharacterId()))) &&
-            ((this.gameId==null && other.getGameId()==null) || 
-             (this.gameId!=null &&
-              this.gameId.equals(other.getGameId()))) &&
+            this.characterId == other.getCharacterId() &&
+            this.gameId == other.getGameId() &&
             ((this.gameObjects==null && other.getGameObjects()==null) || 
              (this.gameObjects!=null &&
               java.util.Arrays.equals(this.gameObjects, other.getGameObjects()))) &&
             ((this.ipAddress==null && other.getIpAddress()==null) || 
              (this.ipAddress!=null &&
               this.ipAddress.equals(other.getIpAddress()))) &&
-            ((this.mapHeight==null && other.getMapHeight()==null) || 
-             (this.mapHeight!=null &&
-              this.mapHeight.equals(other.getMapHeight()))) &&
-            ((this.mapWidth==null && other.getMapWidth()==null) || 
-             (this.mapWidth!=null &&
-              this.mapWidth.equals(other.getMapWidth()))) &&
+            this.mapHeight == other.getMapHeight() &&
+            this.mapWidth == other.getMapWidth() &&
             ((this.players==null && other.getPlayers()==null) || 
              (this.players!=null &&
               java.util.Arrays.equals(this.players, other.getPlayers()))) &&
             ((this.sessionId==null && other.getSessionId()==null) || 
              (this.sessionId!=null &&
               java.util.Arrays.equals(this.sessionId, other.getSessionId()))) &&
-            ((this.tcpPort==null && other.getTcpPort()==null) || 
-             (this.tcpPort!=null &&
-              this.tcpPort.equals(other.getTcpPort()))) &&
-            ((this.udpPort==null && other.getUdpPort()==null) || 
-             (this.udpPort!=null &&
-              this.udpPort.equals(other.getUdpPort()))) &&
+            this.tcpPort == other.getTcpPort() &&
+            this.udpPort == other.getUdpPort() &&
             ((this.version==null && other.getVersion()==null) || 
              (this.version!=null &&
               this.version.equals(other.getVersion())));
@@ -334,12 +322,8 @@ public class GameDTO  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
-        if (getCharacterId() != null) {
-            _hashCode += getCharacterId().hashCode();
-        }
-        if (getGameId() != null) {
-            _hashCode += getGameId().hashCode();
-        }
+        _hashCode += getCharacterId();
+        _hashCode += getGameId();
         if (getGameObjects() != null) {
             for (int i=0;
                  i<java.lang.reflect.Array.getLength(getGameObjects());
@@ -354,12 +338,8 @@ public class GameDTO  implements java.io.Serializable {
         if (getIpAddress() != null) {
             _hashCode += getIpAddress().hashCode();
         }
-        if (getMapHeight() != null) {
-            _hashCode += getMapHeight().hashCode();
-        }
-        if (getMapWidth() != null) {
-            _hashCode += getMapWidth().hashCode();
-        }
+        _hashCode += getMapHeight();
+        _hashCode += getMapWidth();
         if (getPlayers() != null) {
             for (int i=0;
                  i<java.lang.reflect.Array.getLength(getPlayers());
@@ -382,12 +362,8 @@ public class GameDTO  implements java.io.Serializable {
                 }
             }
         }
-        if (getTcpPort() != null) {
-            _hashCode += getTcpPort().hashCode();
-        }
-        if (getUdpPort() != null) {
-            _hashCode += getUdpPort().hashCode();
-        }
+        _hashCode += getTcpPort();
+        _hashCode += getUdpPort();
         if (getVersion() != null) {
             _hashCode += getVersion().hashCode();
         }
@@ -405,21 +381,18 @@ public class GameDTO  implements java.io.Serializable {
         elemField.setFieldName("characterId");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "CharacterId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("gameId");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "GameId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("gameObjects");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "GameObjects"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "GameObjectDTO"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         elemField.setItemQName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "GameObjectDTO"));
         typeDesc.addFieldDesc(elemField);
@@ -427,28 +400,24 @@ public class GameDTO  implements java.io.Serializable {
         elemField.setFieldName("ipAddress");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "IpAddress"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("mapHeight");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "MapHeight"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("mapWidth");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "MapWidth"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("players");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "Players"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "PlayerDTO"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         elemField.setItemQName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "PlayerDTO"));
         typeDesc.addFieldDesc(elemField);
@@ -456,28 +425,24 @@ public class GameDTO  implements java.io.Serializable {
         elemField.setFieldName("sessionId");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "SessionId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "base64Binary"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("tcpPort");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "TcpPort"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("udpPort");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "UdpPort"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("version");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/Ball_of_Duty_Server.DTO", "Version"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setMinOccurs(0);
         elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }

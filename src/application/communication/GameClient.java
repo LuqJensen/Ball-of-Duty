@@ -10,6 +10,7 @@ import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameDTO;
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.GameObjectDTO;
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.LoginDTO;
 import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_DTO.PlayerDTO;
+import org.datacontract.schemas._2004._07.Ball_of_Duty_Server_Exceptions.VersionOutdatedFault;
 import org.tempuri.BoDServiceLocator;
 import org.tempuri.IBoDService;
 
@@ -36,7 +37,7 @@ import javafx.scene.layout.Pane;
 public class GameClient extends Observable
 {
 
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "0.0.0";
     private ClientMap cMap;
     private Player clientPlayer;
     private Account account;
@@ -93,7 +94,7 @@ public class GameClient extends Observable
         return leaderboard;
     }
 
-    public void login(String username, String password) throws WrongPasswordException 
+    public void login(String username, String password) throws WrongPasswordException
     {
         try
         {
@@ -214,6 +215,7 @@ public class GameClient extends Observable
     private void joinGame(Pane gameBox, Specializations spec) throws BadVersionException
     {
         System.out.println("trying to join game");
+
         try
         {
 
@@ -223,10 +225,6 @@ public class GameClient extends Observable
             }
 
             GameDTO map = ibs.joinGame(clientPlayer.getId(), spec.getValue(), VERSION);
-            if (!map.getVersion().equals(VERSION))
-            {
-                throw new BadVersionException("Current version out of date");
-            }
             Broker broker = new Broker(map.getIpAddress(), map.getTcpPort(), map.getUdpPort());
             broker.register(Observation.SERVER_OFFLINE, this, (Observable, data) -> brokerError());
 
@@ -243,8 +241,13 @@ public class GameClient extends Observable
             cMap = new ClientMap(map, gameBox, broker, clientPlayer);
             inGame = true;
         }
+        catch (VersionOutdatedFault e)
+        {
+            throw new BadVersionException(e.getMessage1());
+        }
         catch (RemoteException e)
         {
+            System.out.println("hello");
             e.printStackTrace();
         }
 

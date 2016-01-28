@@ -57,8 +57,7 @@ public class GUI extends Application
      * 
      * @param The
      *            stage of which scene to get the relative location.
-     * @return The relative location of the scene. The relative location is based on how the scene's is located relative to the operating
-     *         system.
+     * @return The relative location of the scene. The relative location is based on how the scene's is located relative to the operating system.
      */
     private TranslatedPoint getRelativeSceneLocation(Stage stage)
     {
@@ -440,7 +439,7 @@ public class GUI extends Application
             {
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Server Message");
-                alert.setHeaderText("Client version out of date");
+                alert.setHeaderText(e1.getMessage());
                 alert.setContentText(
                         "We've made a new version of the game, to play the game please redownload the jar file from the same drive link.");
                 alert.showAndWait();
